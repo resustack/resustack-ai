@@ -1,8 +1,8 @@
 """Pytest configuration and fixtures."""
 
 import pytest
+from backend.api.rest.main import app
 from fastapi.testclient import TestClient
-from src.app.main import app
 
 
 @pytest.fixture

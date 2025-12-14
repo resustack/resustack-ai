@@ -30,7 +30,7 @@ dev = [
 [tool.ruff]
 line-length = 100
 target-version = "py312"
-src = ["src"]
+src = ["backend"]
 
 [tool.ruff.lint]
 select = [
@@ -55,6 +55,7 @@ warn_unused_configs = true
 ignore_missing_imports = true
 strict = false
 plugins = ["pydantic.mypy"]
+mypy_path = "backend"
 
 [[tool.mypy.overrides]]
 module = "tests.*"
@@ -64,12 +65,12 @@ ignore_errors = true
 [tool.pytest.ini_options]
 testpaths = ["tests"]
 asyncio_mode = "auto"
-pythonpath = ["src"]
+pythonpath = ["backend"]
 addopts = "-v --tb=short"
 
 # Development commands (run with uv):
-# - Dev server: uv run uvicorn src.app.main:app --reload
+# - Dev server: uv run uvicorn backend.main:app --reload
 # - Tests: uv run pytest
-# - Lint: uv run ruff check src tests
-# - Format: uv run ruff format src tests
-# - Type check: uv run mypy src
+# - Lint: uv run ruff check backend tests
+# - Format: uv run ruff format backend tests
+# - Type check: uv run mypy backend

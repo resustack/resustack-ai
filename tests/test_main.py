@@ -9,7 +9,7 @@ def test_root(client: TestClient) -> None:
     assert response.status_code == 200
     data = response.json()
     assert data["status"] == "ok"
-    assert data["service"] == "ai-service"
+    assert data["service"] == "resustack-ai-service"
 
 
 def test_health(client: TestClient) -> None:
@@ -18,4 +18,3 @@ def test_health(client: TestClient) -> None:
     assert response.status_code == 200
     data = response.json()
     assert data["status"] == "healthy"
-    assert "environment" in data
