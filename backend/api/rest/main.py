@@ -1,6 +1,14 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
+from backend.api.rest.exceptions import (
+    ReviewServiceError,
+    ReviewValidationError,
+    generic_exception_handler,
+    review_service_error_handler,
+    review_validation_error_handler,
+    value_error_handler,
+)
 from backend.api.rest.v1.routes.reviews import router as api_v1_reviews_router
 
 app = FastAPI(
@@ -16,6 +24,12 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
+# 예외 핸들러 등록
+app.add_exception_handler(ReviewValidationError, review_validation_error_handler)
+app.add_exception_handler(ReviewServiceError, review_service_error_handler)
+app.add_exception_handler(ValueError, value_error_handler)
+app.add_exception_handler(Exception, generic_exception_handler)
 
 app.include_router(api_v1_reviews_router, prefix="/api/v1/resumes")
 
