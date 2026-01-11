@@ -8,11 +8,9 @@ class BlockPromptStrategy(BasePromptStrategy):
     """단일 블록 리뷰 프롬프트 전략."""
 
     def __init__(self, section_type: SectionType):
+        super().__init__()
         self.section_type = section_type
         self._section_strategy = SectionPromptStrategy(section_type)
-
-    def build_system_prompt(self) -> str:
-        return self._section_strategy.build_system_prompt()
 
     def build_evaluation_system_prompt(self) -> str:
         return self._section_strategy.build_evaluation_system_prompt()
