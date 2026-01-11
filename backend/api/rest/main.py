@@ -1,9 +1,7 @@
-"""FastAPI application for REST API."""
-
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
-from backend.api.rest.v1.routes import resumes as api_v1_resumes
+from backend.api.rest.v1.routes.reviews import router as api_v1_reviews_router
 
 app = FastAPI(
     title="Resustack AI Service",
@@ -19,7 +17,7 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-app.include_router(api_v1_resumes.router, prefix="/api/v1/resumes")
+app.include_router(api_v1_reviews_router, prefix="/api/v1/resumes")
 
 
 @app.get("/")
