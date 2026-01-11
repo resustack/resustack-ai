@@ -1,3 +1,4 @@
+from functools import lru_cache
 from uuid import UUID
 
 from backend.ai.chains.review_chain import ReviewChain, SectionReviewChain
@@ -8,9 +9,11 @@ from backend.api.rest.v1.schemas.resumes import (
     ResumeSectionReviewRequest,
     ResumeSkillReviewRequest,
 )
+from backend.api.rest.v1.schemas.reviews import ReviewResponse, SectionReviewResponse
 from backend.domain.resume.enums import SectionType
 from backend.services.review.assembler import ReviewContextAssembler
 from backend.services.review.enums import ReviewTargetType
+from backend.services.review.mapper import ReviewResponseMapper
 
 
 class ReviewService:
@@ -21,55 +24,61 @@ class ReviewService:
         assembler: ReviewContextAssembler | None = None,
         chain: ReviewChain | None = None,
         section_chain: SectionReviewChain | None = None,
+        mapper: ReviewResponseMapper | None = None,
     ):
         self._assembler = assembler or ReviewContextAssembler()
         self._chain = chain or ReviewChain()
         self._section_chain = section_chain or SectionReviewChain()
+        self._mapper = mapper or ReviewResponseMapper()
 
     async def review_summary(
         self,
         resume_id: UUID,
         request: ResumeReviewRequest,
-    ) -> ReviewResult:
+    ) -> ReviewResponse:
         """전체 이력서 요약 리뷰."""
         context = self._assembler.assemble_full(resume_id, request)
-        return await self._chain.run(context)
+        result = await self._chain.run(context)
+        return self._mapper.to_review_response(resume_id, result)
 
     async def review_introduction(
         self,
         resume_id: UUID,
         request: ResumeReviewRequest,
-    ) -> ReviewResult:
+    ) -> ReviewResponse:
         """소개글 리뷰."""
         context = self._assembler.assemble_introduction(resume_id, request)
-        return await self._chain.run(context)
+        result = await self._chain.run(context)
+        return self._mapper.to_review_response(resume_id, result)
 
     async def review_skill(
         self,
         resume_id: UUID,
         request: ResumeSkillReviewRequest,
-    ) -> ReviewResult:
+    ) -> ReviewResponse:
         """스킬 리뷰."""
         context = self._assembler.assemble_skill(resume_id, request)
-        return await self._chain.run(context)
+        result = await self._chain.run(context)
+        return self._mapper.to_review_response(resume_id, result)
 
     async def review_section(
         self,
         resume_id: UUID,
         section_type: SectionType,
         request: ResumeSectionReviewRequest,
-    ) -> SectionReviewResult:
+    ) -> SectionReviewResponse:
         """섹션 리뷰 (경력/프로젝트/교육)."""
         context = self._assembler.assemble_section(resume_id, section_type, request)
         block_results = await self._section_chain.run(context)
         overall_evaluation = self._summarize_block_results(block_results)
 
-        return SectionReviewResult(
+        section_result = SectionReviewResult(
             target_type=ReviewTargetType.from_section_type(section_type),
             section_id=request.id,
             overall_evaluation=overall_evaluation,
             block_results=block_results,
         )
+        return self._mapper.to_section_review_response(resume_id, section_result)
 
     async def review_block(
         self,
@@ -78,12 +87,13 @@ class ReviewService:
         section_id: UUID,
         block_id: UUID,
         request: ResumeBlockReviewRequest,
-    ) -> ReviewResult:
+    ) -> ReviewResponse:
         """단일 블록 리뷰."""
         context = self._assembler.assemble_block(
             resume_id, section_type, section_id, block_id, request
         )
-        return await self._chain.run(context)
+        result = await self._chain.run(context)
+        return self._mapper.to_review_response(resume_id, result)
 
     def _summarize_block_results(self, results: list[ReviewResult]) -> str:
         """블록별 결과를 종합하여 섹션 전체 평가 요약 생성."""
@@ -98,6 +108,7 @@ class ReviewService:
         return "\n".join(summaries)
 
 
+@lru_cache
 def get_review_service() -> ReviewService:
-    """ReviewService 인스턴스 생성."""
+    """ReviewService 싱글톤 인스턴스 반환."""
     return ReviewService()

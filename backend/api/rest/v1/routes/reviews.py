@@ -1,7 +1,7 @@
 import logging
 from uuid import UUID
 
-from fastapi import APIRouter, Depends, HTTPException, status
+from fastapi import APIRouter, Depends, status
 
 from backend.api.rest.v1.schemas.resumes import (
     ResumeBlockReviewRequest,
@@ -38,23 +38,9 @@ async def review_block(
     섹션 내 특정 블록 하나만 선택하여 상세 평가합니다.
     예: 여러 프로젝트 중 하나의 프로젝트만 리뷰
     """
-    try:
-        result = await service.review_block(
-            resume_id, section_type, section_id, block_id, request
-        )
-        return ReviewResponse.from_review_result(resume_id, result)
-    except ValueError as e:
-        logger.warning(f"블록 리뷰 검증 오류: {e}", exc_info=True)
-        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=str(e))
-    except Exception as e:
-        logger.error(
-            f"블록 리뷰 처리 중 오류 발생 (resume_id={resume_id}, block_id={block_id}): {e}",
-            exc_info=True,
-        )
-        raise HTTPException(
-            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail=f"AI 서비스 오류: {str(e)}",
-        )
+    return await service.review_block(
+        resume_id, section_type, section_id, block_id, request
+    )
 
 
 @router.post(
@@ -73,21 +59,7 @@ async def review_introduction(
 
     핵심 역량 명확성, 차별화 포인트, 직무 연관성 등을 평가합니다.
     """
-    try:
-        result = await service.review_introduction(resume_id, request)
-        return ReviewResponse.from_review_result(resume_id, result)
-    except ValueError as e:
-        logger.warning(f"소개글 리뷰 검증 오류: {e}", exc_info=True)
-        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=str(e))
-    except Exception as e:
-        logger.error(
-            f"소개글 리뷰 처리 중 오류 발생 (resume_id={resume_id}): {e}",
-            exc_info=True,
-        )
-        raise HTTPException(
-            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail=f"AI 서비스 오류: {str(e)}",
-        )
+    return await service.review_introduction(resume_id, request)
 
 
 @router.post(
@@ -106,21 +78,7 @@ async def review_skills(
 
     기술 스택 구성, 깊이 vs 넓이, 최신 트렌드 반영 등을 평가합니다.
     """
-    try:
-        result = await service.review_skill(resume_id, request)
-        return ReviewResponse.from_review_result(resume_id, result)
-    except ValueError as e:
-        logger.warning(f"스킬 리뷰 검증 오류: {e}", exc_info=True)
-        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=str(e))
-    except Exception as e:
-        logger.error(
-            f"스킬 리뷰 처리 중 오류 발생 (resume_id={resume_id}): {e}",
-            exc_info=True,
-        )
-        raise HTTPException(
-            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail=f"AI 서비스 오류: {str(e)}",
-        )
+    return await service.review_skill(resume_id, request)
 
 
 @router.post(
@@ -145,21 +103,7 @@ async def review_section(
     - **project**: 기술적 깊이 및 비즈니스 임팩트 평가
     - **education**: 직무 연관성 및 학습 성과 평가
     """
-    try:
-        result = await service.review_section(resume_id, section_type, request)
-        return SectionReviewResponse.from_section_review_result(resume_id, result)
-    except ValueError as e:
-        logger.warning(f"섹션 리뷰 검증 오류: {e}", exc_info=True)
-        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=str(e))
-    except Exception as e:
-        logger.error(
-            f"섹션 리뷰 오류 (resume_id={resume_id}, section_type={section_type}): {e}",
-            exc_info=True,
-        )
-        raise HTTPException(
-            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail=f"AI 서비스 오류: {str(e)}",
-        )
+    return await service.review_section(resume_id, section_type, request)
 
 
 @router.post(
@@ -178,18 +122,4 @@ async def review_resume_summary(
 
     이력서의 전체 구성, 일관성, 차별화 포인트 등을 종합 평가합니다.
     """
-    try:
-        result = await service.review_summary(resume_id, request)
-        return ReviewResponse.from_review_result(resume_id, result)
-    except ValueError as e:
-        logger.warning(f"전체 이력서 리뷰 검증 오류: {e}", exc_info=True)
-        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=str(e))
-    except Exception as e:
-        logger.error(
-            f"전체 이력서 리뷰 오류 (resume_id={resume_id}): {e}",
-            exc_info=True,
-        )
-        raise HTTPException(
-            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail=f"AI 서비스 오류: {str(e)}",
-        )
+    return await service.review_summary(resume_id, request)
