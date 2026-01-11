@@ -1,8 +1,4 @@
-"""Review Context Assembler.
-
-Request Schema를 해석하여 ReviewContext 도메인 모델로 조립합니다.
-"""
-
+from functools import lru_cache
 from uuid import UUID
 
 from backend.api.rest.v1.schemas.resumes import (
@@ -214,3 +210,9 @@ class ReviewContextAssembler:
             tech_stack=block.tech_stack,
             link=str(block.link) if block.link else None,
         )
+
+
+@lru_cache
+def get_review_context_assembler() -> ReviewContextAssembler:
+    """ReviewContextAssembler 싱글톤 인스턴스 반환."""
+    return ReviewContextAssembler()

@@ -1,4 +1,3 @@
-from functools import lru_cache
 from uuid import UUID
 
 from backend.ai.chains.review_chain import ReviewChain, SectionReviewChain
@@ -21,15 +20,15 @@ class ReviewService:
 
     def __init__(
         self,
-        assembler: ReviewContextAssembler | None = None,
-        chain: ReviewChain | None = None,
-        section_chain: SectionReviewChain | None = None,
-        mapper: ReviewResponseMapper | None = None,
+        assembler: ReviewContextAssembler,
+        chain: ReviewChain,
+        section_chain: SectionReviewChain,
+        mapper: ReviewResponseMapper,
     ):
-        self._assembler = assembler or ReviewContextAssembler()
-        self._chain = chain or ReviewChain()
-        self._section_chain = section_chain or SectionReviewChain()
-        self._mapper = mapper or ReviewResponseMapper()
+        self._assembler = assembler
+        self._chain = chain
+        self._section_chain = section_chain
+        self._mapper = mapper
 
     async def review_summary(
         self,
@@ -106,9 +105,3 @@ class ReviewService:
             summaries.append(summary)
 
         return "\n".join(summaries)
-
-
-@lru_cache
-def get_review_service() -> ReviewService:
-    """ReviewService 싱글톤 인스턴스 반환."""
-    return ReviewService()

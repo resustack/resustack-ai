@@ -1,8 +1,4 @@
-"""Review Response Mapper.
-
-AI output 모델을 API Response 모델로 변환합니다.
-"""
-
+from functools import lru_cache
 from uuid import UUID
 
 from backend.ai.output.review_result import ReviewResult, SectionReviewResult
@@ -62,3 +58,9 @@ class ReviewResponseMapper:
             overall_evaluation=result.overall_evaluation,
             block_results=block_responses,
         )
+
+
+@lru_cache
+def get_review_response_mapper() -> ReviewResponseMapper:
+    """ReviewResponseMapper 싱글톤 인스턴스 반환."""
+    return ReviewResponseMapper()

@@ -11,7 +11,8 @@ from backend.api.rest.v1.schemas.resumes import (
 )
 from backend.api.rest.v1.schemas.reviews import ReviewResponse, SectionReviewResponse
 from backend.domain.resume.enums import SectionType
-from backend.services.review.service import ReviewService, get_review_service
+from backend.services.review import get_review_service
+from backend.services.review.service import ReviewService
 
 logger = logging.getLogger(__name__)
 
