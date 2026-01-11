@@ -1,14 +1,24 @@
 from datetime import datetime
 from uuid import UUID
 
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, ConfigDict, Field
+from pydantic.alias_generators import to_camel
 from pydantic_core import Url
 
 from backend.domain.resume.enums import SectionType
 
 
+# 도메인 모델용 ConfigDict (camelCase 입력 허용)
+DOMAIN_CONFIG = ConfigDict(
+    alias_generator=to_camel,
+    populate_by_name=True,
+)
+
+
 class Profile(BaseModel):
     """프로필 모델"""
+
+    model_config = DOMAIN_CONFIG
 
     name: str = Field(..., description="이름")
     position: str = Field(..., description="직무")
@@ -23,6 +33,8 @@ class Profile(BaseModel):
 class Block(BaseModel):
     """Section 영역에서 차지하는 모델"""
 
+    model_config = DOMAIN_CONFIG
+
     id: UUID = Field(..., description="블록 ID")
     sub_title: str = Field(..., description="블록 부제목")
     period: str = Field(..., description="기간")
@@ -35,6 +47,8 @@ class Block(BaseModel):
 class Section(BaseModel):
     """이력서에서 차지하는 논리적인 단위 모델"""
 
+    model_config = DOMAIN_CONFIG
+
     id: UUID = Field(..., description="섹션 ID")
     type: SectionType = Field(..., description="섹션 타입")
     title: str = Field(..., description="섹션 제목")
@@ -44,6 +58,8 @@ class Section(BaseModel):
 
 class Skills(BaseModel):
     """스킬 모델"""
+
+    model_config = DOMAIN_CONFIG
 
     dev_ops: list[str] = Field(..., description="DevOps 스킬")
     language: list[str] = Field(..., description="프로그래밍 언어")
@@ -57,6 +73,8 @@ class Skills(BaseModel):
 
 class Resume(BaseModel):
     """이력서 모델"""
+
+    model_config = DOMAIN_CONFIG
 
     id: str = Field(..., alias="_id", description="이력서 ID")
     user_id: int = Field(..., description="사용자 ID")
