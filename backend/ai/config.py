@@ -1,17 +1,22 @@
-"""AI service configuration."""
-
 from functools import lru_cache
+from pathlib import Path
 
-from langchain_anthropic import ChatAnthropic
 from pydantic import Field
 from pydantic_settings import BaseSettings, SettingsConfigDict
+
+
+def _get_project_root() -> Path:
+    """프로젝트 루트 디렉토리 경로 반환."""
+    current_file = Path(__file__)
+    # backend/ai/config.py -> backend/ai -> backend -> project root
+    return current_file.parent.parent.parent
 
 
 class AIConfig(BaseSettings):
     """AI 서비스 설정 클래스."""
 
     model_config = SettingsConfigDict(
-        env_file=".env",
+        env_file=str(_get_project_root() / ".env"),
         env_file_encoding="utf-8",
         case_sensitive=False,
         extra="ignore",
@@ -50,16 +55,3 @@ class AIConfig(BaseSettings):
 def get_ai_config() -> AIConfig:
     """AI 설정 싱글톤 인스턴스 반환."""
     return AIConfig()
-
-
-def get_anthropic_client() -> ChatAnthropic:
-    """Anthropic Claude 클라이언트 생성."""
-    config = get_ai_config()
-
-    return ChatAnthropic(
-        model=config.anthropic_model,
-        anthropic_api_key=config.anthropic_api_key,
-        max_tokens=config.anthropic_max_tokens,
-        temperature=config.anthropic_temperature,
-        top_p=config.anthropic_top_p,
-    )
