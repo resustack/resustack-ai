@@ -38,16 +38,6 @@ class ReviewChain:
 
         return improvement
 
-    def run_sync(self, context: ReviewContext) -> ReviewResult:
-        """2단계 리뷰 동기 실행 (테스트용)."""
-        # Step 1: 평가
-        evaluation = self._evaluate_sync(context)
-
-        # Step 2: 평가 결과를 바탕으로 개선
-        improvement = self._improve_sync(context, evaluation)
-
-        return improvement
-
     async def _evaluate(self, context: ReviewContext) -> EvaluationResult:
         """1단계: 평가만 수행."""
         strategy = PromptStrategyFactory.get(context)
@@ -56,21 +46,6 @@ class ReviewChain:
         chain = evaluation_prompt | self._llm | self._evaluation_parser
 
         result: EvaluationResult = await chain.ainvoke({})
-        result.target_type = context.target_type
-
-        if context.block:
-            result.block_id = context.block.block_id
-
-        return result
-
-    def _evaluate_sync(self, context: ReviewContext) -> EvaluationResult:
-        """1단계: 평가만 수행 (동기)."""
-        strategy = PromptStrategyFactory.get(context)
-
-        evaluation_prompt = self._build_evaluation_prompt(strategy, context)
-        chain = evaluation_prompt | self._llm | self._evaluation_parser
-
-        result: EvaluationResult = chain.invoke({})
         result.target_type = context.target_type
 
         if context.block:
@@ -90,30 +65,6 @@ class ReviewChain:
         chain = improvement_prompt | self._llm | self._improvement_parser
 
         result: ReviewResult = await chain.ainvoke({})
-
-        # 평가 결과를 최종 결과에 포함
-        result.target_type = context.target_type
-        result.strengths = evaluation.strengths
-        result.weaknesses = evaluation.weaknesses
-        result.evaluation_summary = evaluation.summary
-
-        if context.block:
-            result.block_id = context.block.block_id
-
-        return result
-
-    def _improve_sync(
-        self, context: ReviewContext, evaluation: EvaluationResult
-    ) -> ReviewResult:
-        """2단계: 평가 결과를 바탕으로 개선안 생성 (동기)."""
-        strategy = PromptStrategyFactory.get(context)
-
-        improvement_prompt = self._build_improvement_prompt(
-            strategy, context, evaluation
-        )
-        chain = improvement_prompt | self._llm | self._improvement_parser
-
-        result: ReviewResult = chain.invoke({})
 
         # 평가 결과를 최종 결과에 포함
         result.target_type = context.target_type
