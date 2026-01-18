@@ -102,7 +102,7 @@ class SectionReviewChain:
         block_target_type = ReviewTargetType.from_section_type_block(
             context.section.section_type
         )
-        
+
         # 모든 블록 컨텍스트 생성
         block_contexts = [
             ReviewContext(

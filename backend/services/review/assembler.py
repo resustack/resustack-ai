@@ -2,7 +2,6 @@ from functools import lru_cache
 from uuid import UUID
 
 from backend.api.rest.v1.schemas.resumes import (
-    Block,
     ResumeBlockReviewRequest,
     ResumeReviewRequest,
     ResumeSectionReviewRequest,

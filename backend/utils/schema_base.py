@@ -1,7 +1,6 @@
 from pydantic import BaseModel, ConfigDict
 from pydantic.alias_generators import to_camel
 
-
 # Camel case 변환을 위한 공통 ConfigDict
 CAMEL_CONFIG = ConfigDict(
     # Python 내부(snake_case) -> 외부(camelCase) 변환

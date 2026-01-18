@@ -7,7 +7,6 @@ from pydantic_core import Url
 
 from backend.domain.resume.enums import SectionType
 
-
 # 도메인 모델용 ConfigDict (camelCase 입력 허용)
 DOMAIN_CONFIG = ConfigDict(
     alias_generator=to_camel,
