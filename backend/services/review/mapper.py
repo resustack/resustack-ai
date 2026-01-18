@@ -4,7 +4,6 @@ from uuid import UUID
 from backend.ai.output.review_result import ReviewResult, SectionReviewResult
 from backend.api.rest.v1.schemas.reviews import (
     BlockReviewResponse,
-    ImprovementPointResponse,
     ReviewResponse,
     SectionReviewResponse,
 )
@@ -21,10 +20,7 @@ class ReviewResponseMapper:
             target_type=result.target_type.value,
             evaluation_summary=result.evaluation_summary,
             strengths=result.strengths,
-            weaknesses=[
-                ImprovementPointResponse(problem=w.problem, reason=w.reason)
-                for w in result.weaknesses
-            ],
+            weaknesses=result.weaknesses,
             improvement_suggestion=result.improvement_suggestion,
             improved_content=result.improved_content,
             block_id=result.block_id,
@@ -41,10 +37,7 @@ class ReviewResponseMapper:
                 block_id=br.block_id,
                 evaluation_summary=br.evaluation_summary,
                 strengths=br.strengths,
-                weaknesses=[
-                    ImprovementPointResponse(problem=w.problem, reason=w.reason)
-                    for w in br.weaknesses
-                ],
+                weaknesses=br.weaknesses,
                 improvement_suggestion=br.improvement_suggestion,
                 improved_content=br.improved_content,
             )

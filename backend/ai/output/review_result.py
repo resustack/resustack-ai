@@ -5,21 +5,16 @@ from pydantic import BaseModel, Field
 from backend.services.review.enums import ReviewTargetType
 
 
-class ImprovementPoint(BaseModel):
-    """개선이 필요한 부분."""
-
-    problem: str = Field(..., description="구체적인 문제점")
-    reason: str = Field(..., description="왜 문제인지 설명")
-
-
 class EvaluationResult(BaseModel):
     """1단계 평가 결과 (개선안 제외)."""
 
     target_type: ReviewTargetType = Field(..., description="리뷰 대상 타입")
     summary: str = Field(..., description="전반적인 평가 요약")
-    strengths: list[str] = Field(default_factory=list, description="잘된 점 목록")
-    weaknesses: list[ImprovementPoint] = Field(
-        default_factory=list, description="개선 필요점 목록"
+    strengths: list[str] = Field(
+        ..., max_length=3, description="잘된 점 목록"
+    )
+    weaknesses: list[str] = Field(
+        ..., max_length=3, description="개선 필요점 목록"
     )
     block_id: UUID | None = Field(None, description="리뷰한 블록 ID")
 
@@ -32,9 +27,11 @@ class ReviewResult(BaseModel):
 
     target_type: ReviewTargetType = Field(..., description="리뷰 대상 타입")
     evaluation_summary: str = Field(..., description="전반적인 평가 요약")
-    strengths: list[str] = Field(default_factory=list, description="잘된 점 목록")
-    weaknesses: list[ImprovementPoint] = Field(
-        default_factory=list, description="개선 필요점 목록"
+    strengths: list[str] = Field(
+        ..., max_length=3, description="잘된 점 목록"
+    )
+    weaknesses: list[str] = Field(
+        ..., max_length=3, description="개선 필요점 목록"
     )
     improvement_suggestion: str = Field(..., description="개선 제안 요약")
     improved_content: str | None = Field(

@@ -1,15 +1,7 @@
 from uuid import UUID
 
-from pydantic import Field
-
 from backend.utils.schema_base import CamelModel
-
-
-class ImprovementPointResponse(CamelModel):
-    """개선 필요점 응답 모델."""
-
-    problem: str = Field(..., description="구체적인 문제점")
-    reason: str = Field(..., description="왜 문제인지 설명")
+from pydantic import Field
 
 
 class ReviewResponse(CamelModel):
@@ -19,7 +11,7 @@ class ReviewResponse(CamelModel):
     target_type: str = Field(..., description="리뷰 대상 타입")
     evaluation_summary: str = Field(..., description="전반적인 평가 요약")
     strengths: list[str] = Field(default_factory=list, description="잘된 점 목록")
-    weaknesses: list[ImprovementPointResponse] = Field(
+    weaknesses: list[str] = Field(
         default_factory=list, description="개선 필요점 목록"
     )
     improvement_suggestion: str = Field(..., description="개선 제안 요약")
@@ -35,7 +27,7 @@ class BlockReviewResponse(CamelModel):
     block_id: UUID | None = Field(None, description="블록 ID")
     evaluation_summary: str = Field(..., description="블록 평가 요약")
     strengths: list[str] = Field(default_factory=list, description="잘된 점 목록")
-    weaknesses: list[ImprovementPointResponse] = Field(
+    weaknesses: list[str] = Field(
         default_factory=list, description="개선 필요점 목록"
     )
     improvement_suggestion: str = Field(..., description="개선 제안")

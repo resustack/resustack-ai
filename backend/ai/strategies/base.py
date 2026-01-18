@@ -76,7 +76,7 @@ class BasePromptStrategy(PromptStrategy):
 {self._format_list(evaluation.strengths)}
 
 ### 약점
-{self._format_weaknesses(evaluation.weaknesses)}
+{self._format_list(evaluation.weaknesses)}
 
 ---
 
@@ -90,13 +90,3 @@ class BasePromptStrategy(PromptStrategy):
         if not items:
             return "- 없음"
         return "\n".join(f"- {item}" for item in items)
-
-    def _format_weaknesses(self, weaknesses: list) -> str:
-        """약점 리스트를 포맷팅."""
-        if not weaknesses:
-            return "- 없음"
-        result = []
-        for w in weaknesses:
-            result.append(f"- **문제**: {w.problem}")
-            result.append(f"  **이유**: {w.reason}")
-        return "\n".join(result)
