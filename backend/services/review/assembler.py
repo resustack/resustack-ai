@@ -83,7 +83,7 @@ class ReviewContextAssembler:
     ) -> ReviewContext:
         """소개글 리뷰용 컨텍스트 조립."""
         work_exp_summary = self._preprocess_section(request, SectionType.WORK_EXPERIENCE)
-        project_summary = self.ㅌ(request, SectionType.PROJECT)
+        project_summary = self._preprocess_section(request, SectionType.PROJECT)
 
         introduction_data = IntroductionData(
             name=request.profile.name,
