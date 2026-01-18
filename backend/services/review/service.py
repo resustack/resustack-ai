@@ -1,7 +1,8 @@
+from __future__ import annotations
+
+from typing import TYPE_CHECKING
 from uuid import UUID
 
-from backend.ai.chains.review_chain import ReviewChain, SectionReviewChain
-from backend.ai.output.review_result import ReviewResult, SectionReviewResult
 from backend.api.rest.v1.schemas.resumes import (
     ResumeBlockReviewRequest,
     ResumeReviewRequest,
@@ -13,6 +14,10 @@ from backend.domain.resume.enums import SectionType
 from backend.services.review.assembler import ReviewContextAssembler
 from backend.services.review.enums import ReviewTargetType
 from backend.services.review.mapper import ReviewResponseMapper
+
+if TYPE_CHECKING:
+    from backend.ai.chains.review_chain import ReviewChain, SectionReviewChain
+    from backend.ai.output.review_result import ReviewResult, SectionReviewResult
 
 
 class ReviewService:

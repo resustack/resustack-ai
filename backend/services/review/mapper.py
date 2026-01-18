@@ -1,12 +1,17 @@
+from __future__ import annotations
+
 from functools import lru_cache
+from typing import TYPE_CHECKING
 from uuid import UUID
 
-from backend.ai.output.review_result import ReviewResult, SectionReviewResult
 from backend.api.rest.v1.schemas.reviews import (
     BlockReviewResponse,
     ReviewResponse,
     SectionReviewResponse,
 )
+
+if TYPE_CHECKING:
+    from backend.ai.output.review_result import ReviewResult, SectionReviewResult
 
 
 class ReviewResponseMapper:
