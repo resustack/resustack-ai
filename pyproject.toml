@@ -68,8 +68,8 @@ asyncio_mode = "auto"
 pythonpath = ["backend"]
 addopts = "-v --tb=short"
 
-# Development commands (run with uv):
-# - Dev server: uv run uvicorn backend.main:app --reload
+# Development commands:
+# - Dev server: make dev (or: uv run python -m backend.main)
 # - Tests: uv run pytest
 # - Lint: uv run ruff check backend tests
 # - Format: uv run ruff format backend tests

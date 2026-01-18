@@ -1,7 +1,7 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
-from backend.ai.config import get_ai_config
+from backend.api.rest.config import get_api_config
 from backend.api.rest.exceptions import (
     ReviewServiceError,
     ReviewValidationError,
@@ -18,10 +18,13 @@ app = FastAPI(
     version="0.1.0",
 )
 
-config = get_ai_config()
+api_config = get_api_config()
+
+print(api_config)
+
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=config.cors_origins,
+    allow_origins=api_config.cors_origins,
     allow_credentials=True,
     allow_methods=["GET", "POST", "PUT", "DELETE", "OPTIONS"],
     allow_headers=["Content-Type", "Authorization"],
