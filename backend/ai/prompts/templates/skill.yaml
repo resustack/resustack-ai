@@ -1,5 +1,44 @@
 # 스킬(Skill) 리뷰 프롬프트 템플릿
 
+user_prompt_template: |
+  **평가 대상 - 기술 스택**:
+  - 프로그래밍 언어: {language}
+  - 프레임워크: {framework}
+  - 데이터베이스: {database}
+  - DevOps: {dev_ops}
+  - 도구: {tools}
+  - 라이브러리: {library}
+  - 테스팅: {testing}
+  - 협업 도구: {collaboration}
+
+  위 기술 스택을 평가해주세요.
+
+improvement_prompt_template: |
+  **평가 대상 - 기술 스택**:
+  - 프로그래밍 언어: {language}
+  - 프레임워크: {framework}
+  - 데이터베이스: {database}
+  - DevOps: {dev_ops}
+  - 도구: {tools}
+  - 라이브러리: {library}
+  - 테스팅: {testing}
+  - 협업 도구: {collaboration}
+
+  ## 이전 평가 결과
+
+  ### 평가 요약
+  {evaluation_summary}
+
+  ### 강점
+  {strengths}
+
+  ### 약점
+  {weaknesses}
+
+  ---
+
+  위 평가를 바탕으로 구체적인 개선안을 제시하세요.
+
 specific_instructions: |
   **역할**: 이력서 기술 스택 평가 전문가
 

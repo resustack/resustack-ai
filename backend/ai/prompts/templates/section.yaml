@@ -1,6 +1,72 @@
 # 섹션(Section) 리뷰 프롬프트 템플릿
 # 경력(work_experience), 프로젝트(project), 교육(education)
 
+# 공통 사용자 프롬프트 템플릿
+user_prompt_template: |
+  **평가 대상 - {section_title} 섹션**
+
+  {blocks_text}
+
+  위 내용을 각 블록별로 평가해주세요.
+
+improvement_prompt_template: |
+  **평가 대상 - {section_title} 섹션**
+
+  {blocks_text}
+
+  ## 이전 평가 결과
+
+  ### 평가 요약
+  {evaluation_summary}
+
+  ### 강점
+  {strengths}
+
+  ### 약점
+  {weaknesses}
+
+  ---
+
+  위 평가를 바탕으로 구체적인 개선안을 제시하세요.
+
+# 블록 전용 프롬프트 템플릿
+block_user_prompt_template: |
+  **평가 대상 - 단일 블록** {section_context}
+
+  ### {sub_title}
+  - 기간: {period}
+  - 기술 스택: {tech_stack}
+  - 링크: {link}
+  - 내용:
+  {content}
+
+  위 내용을 평가해주세요.
+
+block_improvement_prompt_template: |
+  **평가 대상 - 단일 블록** {section_context}
+
+  ### {sub_title}
+  - 기간: {period}
+  - 기술 스택: {tech_stack}
+  - 링크: {link}
+  - 내용:
+  {content}
+
+  ## 이전 평가 결과
+
+  ### 평가 요약
+  {evaluation_summary}
+
+  ### 강점
+  {strengths}
+
+  ### 약점
+  {weaknesses}
+
+  ---
+
+  위 평가를 바탕으로 구체적인 개선안을 제시하세요.
+
 work_experience:
   specific_instructions: |
     **역할**: 이력서 경력 내용 평가 전문가

@@ -1,5 +1,32 @@
 # 전체 이력서(Full Resume) 리뷰 프롬프트 템플릿
 
+user_prompt_template: |
+  **평가 대상 - 전체 이력서**
+
+  {full_resume_text}
+
+  위 이력서를 전체적으로 평가하고, 종합적인 개선 방향을 제시해주세요.
+
+improvement_prompt_template: |
+  **평가 대상 - 전체 이력서**
+
+  {full_resume_text}
+
+  ## 이전 평가 결과
+
+  ### 평가 요약
+  {evaluation_summary}
+
+  ### 강점
+  {strengths}
+
+  ### 약점
+  {weaknesses}
+
+  ---
+
+  위 평가를 바탕으로 구체적인 개선안을 제시하세요.
+
 specific_instructions: |
   **역할**: 이력서 전체 평가 전문가
 

@@ -1,5 +1,42 @@
 # 소개글(Introduction) 리뷰 프롬프트 템플릿
 
+user_prompt_template: |
+  **입력 정보**
+  - 이름: {name}
+  - 목표 직무: {position}
+  - 경력 요약: {work_experience_summary}
+  - 프로젝트 요약: {project_summary}
+
+  **평가 대상 - 현재 소개글**:
+  {content}
+
+  위 소개글을 평가해주세요.
+
+improvement_prompt_template: |
+  **입력 정보**
+  - 이름: {name}
+  - 목표 직무: {position}
+  - 경력 요약: {work_experience_summary}
+  - 프로젝트 요약: {project_summary}
+
+  **평가 대상 - 현재 소개글**:
+  {content}
+
+  ## 이전 평가 결과
+
+  ### 평가 요약
+  {evaluation_summary}
+
+  ### 강점
+  {strengths}
+
+  ### 약점
+  {weaknesses}
+
+  ---
+
+  위 평가를 바탕으로 구체적인 개선안을 제시하세요.
+
 specific_instructions: |
   **역할**: 이력서 프로필 소개글 평가 전문가
 
