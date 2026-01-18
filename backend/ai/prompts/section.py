@@ -1,7 +1,6 @@
 from backend.ai.strategies.base import BasePromptStrategy
 from backend.domain.resume.enums import SectionType
 from backend.services.review.context import ReviewContext
-from backend.utils.yaml_loader import load_prompt_template
 
 
 class SectionPromptStrategy(BasePromptStrategy):
@@ -15,58 +14,48 @@ class SectionPromptStrategy(BasePromptStrategy):
     }
 
     def __init__(self, section_type: SectionType):
-        super().__init__()
         self.section_type = section_type
-        self._section_templates = load_prompt_template("section")
-        self._section_key = self._SECTION_TYPE_TO_KEY.get(section_type, "")
+        self._section_key = self._SECTION_TYPE_TO_KEY.get(section_type, "work_experience")
+        super().__init__()
 
-    def _get_section_instructions(self) -> str:
-        """섹션별 평가 지침 반환."""
-        if self._section_key and self._section_key in self._section_templates:
-            return self._section_templates[self._section_key].get("specific_instructions", "")
-        return ""
+    def get_template_name(self) -> str:
+        """사용할 YAML 템플릿 이름 반환."""
+        return "section"
 
-    def _get_improvement_instructions(self) -> str:
-        """섹션별 개선 지침 반환."""
-        if self._section_key and self._section_key in self._section_templates:
-            return self._section_templates[self._section_key].get("improvement_instructions", "")
-        return ""
+    def _get_specific_instructions(self, key: str = "evaluation_instructions") -> str:
+        """섹션별 세부 지침 반환 (섹션 타입에 따라 다른 지침 사용)."""
+        template = self._get_template()
+        section_config = template.get(self._section_key, {})
 
-    def build_evaluation_system_prompt(self) -> str:
-        specific = self._get_section_instructions()
-        return self._evaluation_system_prompt.format(
-            specific_instructions=specific,
-            format_instructions="{format_instructions}",
-        )
+        # improvement_instructions는 해당 키로, evaluation은 specific_instructions 사용
+        if key == "improvement_instructions":
+            return section_config.get("improvement_instructions", "")
+        return section_config.get("specific_instructions", "")
 
-    def build_improvement_system_prompt(self) -> str:
-        specific = self._get_improvement_instructions()
-        return self._improvement_system_prompt.format(
-            specific_instructions=specific,
-            format_instructions="{format_instructions}",
-        )
-
-    def build_user_prompt(self, context: ReviewContext) -> str:
+    def build_prompt_variables(self, context: ReviewContext) -> dict:
+        """프롬프트 변수 딕셔너리 생성."""
         section = context.section
         if section is None:
             raise ValueError("Section data is required")
 
+        blocks_text = self._format_blocks(section.blocks)
+
+        return {
+            "section_title": section.title,
+            "blocks_text": blocks_text,
+        }
+
+    def _format_blocks(self, blocks: list) -> str:
+        """블록 리스트를 포맷팅."""
         blocks_text = []
-        for i, block in enumerate(section.blocks, 1):
+        for i, block in enumerate(blocks, 1):
             block_text = f"""
 ### 블록 {i}: {block.sub_title}
 - 기간: {block.period}
-- 기술 스택: {', '.join(block.tech_stack) if block.tech_stack else '없음'}
-- 링크: {block.link or '없음'}
+- 기술 스택: {", ".join(block.tech_stack) if block.tech_stack else "없음"}
+- 링크: {block.link or "없음"}
 - 내용:
 {block.content}
 """
             blocks_text.append(block_text)
-
-        return f"""
-**평가 대상 - {section.title} 섹션**
-
-{chr(10).join(blocks_text)}
-
-위 내용을 각 블록별로 평가해주세요.
-"""
+        return "\n".join(blocks_text)

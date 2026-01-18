@@ -1,46 +1,12 @@
 from backend.ai.prompts.block import BlockPromptStrategy
+from backend.ai.prompts.full_resume import FullResumePromptStrategy
 from backend.ai.prompts.introduction import IntroductionPromptStrategy
 from backend.ai.prompts.section import SectionPromptStrategy
 from backend.ai.prompts.skill import SkillPromptStrategy
-from backend.ai.strategies.base import BasePromptStrategy, PromptStrategy
+from backend.ai.strategies.base import PromptStrategy
 from backend.domain.resume.enums import SectionType
 from backend.services.review.context import ReviewContext
 from backend.services.review.enums import ReviewTargetType
-from backend.utils.yaml_loader import get_prompt
-
-
-class FullResumePromptStrategy(BasePromptStrategy):
-    """전체 이력서 리뷰 프롬프트 전략."""
-
-    def __init__(self):
-        super().__init__()
-        self._specific_instructions = get_prompt("full_resume", "specific_instructions")
-        self._evaluation_instructions = get_prompt("full_resume", "evaluation_instructions")
-        self._improvement_instructions = get_prompt("full_resume", "improvement_instructions")
-
-    def build_evaluation_system_prompt(self) -> str:
-        return self._evaluation_system_prompt.format(
-            specific_instructions=self._evaluation_instructions,
-            format_instructions="{format_instructions}",
-        )
-
-    def build_improvement_system_prompt(self) -> str:
-        return self._improvement_system_prompt.format(
-            specific_instructions=self._improvement_instructions,
-            format_instructions="{format_instructions}",
-        )
-
-    def build_user_prompt(self, context: ReviewContext) -> str:
-        if context.full_resume_text is None:
-            raise ValueError("Full resume text is required")
-
-        return f"""
-**평가 대상 - 전체 이력서**
-
-{context.full_resume_text}
-
-위 이력서를 전체적으로 평가하고, 종합적인 개선 방향을 제시해주세요.
-"""
 
 
 class PromptStrategyFactory:
