@@ -50,6 +50,17 @@ class AIConfig(BaseSettings):
         le=1.0,
     )
 
+    # CORS 설정
+    allowed_origins: str = Field(
+        default="http://localhost:3000",
+        description="CORS 허용 도메인 (쉼표로 구분)",
+    )
+
+    @property
+    def cors_origins(self) -> list[str]:
+        """CORS 허용 도메인 리스트 반환."""
+        return [origin.strip() for origin in self.allowed_origins.split(",")]
+
 
 @lru_cache
 def get_ai_config() -> AIConfig:
