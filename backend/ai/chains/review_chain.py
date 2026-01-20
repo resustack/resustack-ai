@@ -1,5 +1,8 @@
 import asyncio
+import logging
 
+from anthropic import AnthropicError
+from langchain_core.exceptions import OutputParserException
 from langchain_core.output_parsers import PydanticOutputParser
 from langchain_core.prompts import ChatPromptTemplate
 
@@ -7,8 +10,11 @@ from backend.ai.chains.llm import get_anthropic_client
 from backend.ai.output.review_result import EvaluationResult, ReviewResult
 from backend.ai.strategies.base import PromptStrategy
 from backend.ai.strategies.factory import PromptStrategyFactory
+from backend.api.rest.exceptions import ReviewServiceError
 from backend.services.review.context import ReviewContext
 from backend.services.review.enums import ReviewTargetType
+
+logger = logging.getLogger(__name__)
 
 
 class ReviewChain:
@@ -27,11 +33,52 @@ class ReviewChain:
         """2단계 리뷰 실행: 평가 → 개선."""
         strategy = PromptStrategyFactory.get(context)
 
-        # Step 1: 평가
-        evaluation = await self._evaluate(strategy, context)
+        try:
+            # Step 1: 평가
+            evaluation = await self._evaluate(strategy, context)
 
-        # Step 2: 평가 결과를 바탕으로 개선
-        return await self._improve(strategy, context, evaluation)
+            # Step 2: 평가 결과를 바탕으로 개선
+            return await self._improve(strategy, context, evaluation)
+
+        except AnthropicError as e:
+            logger.error(
+                f"Anthropic API 에러 발생: {e}",
+                extra={
+                    "error_type": type(e).__name__,
+                    "target_type": context.target_type,
+                    "resume_id": context.resume_id,
+                },
+                exc_info=True,
+            )
+            raise ReviewServiceError(
+                "AI 서비스 오류가 발생했습니다. 잠시 후 다시 시도해주세요."
+            ) from e
+
+        except OutputParserException as e:
+            logger.error(
+                f"AI 응답 파싱 실패: {e}",
+                extra={
+                    "llm_output": e.llm_output[:500] if e.llm_output else None,
+                    "target_type": context.target_type,
+                    "resume_id": context.resume_id,
+                },
+                exc_info=True,
+            )
+            raise ReviewServiceError(
+                "AI 응답 형식이 올바르지 않습니다. 다시 시도해주세요."
+            ) from e
+
+        except Exception as e:
+            logger.error(
+                f"예상치 못한 에러 발생: {e}",
+                extra={
+                    "error_type": type(e).__name__,
+                    "target_type": context.target_type,
+                    "resume_id": context.resume_id,
+                },
+                exc_info=True,
+            )
+            raise ReviewServiceError("서비스 처리 중 오류가 발생했습니다.") from e
 
     async def _evaluate(
         self,
@@ -39,6 +86,10 @@ class ReviewChain:
         context: ReviewContext
     ) -> EvaluationResult:
         """1단계: 평가만 수행."""
+        logger.info(
+            f"평가 시작: target_type={context.target_type}",
+            extra={"resume_id": context.resume_id},
+        )
 
         # 프롬프트 생성
         prompt = ChatPromptTemplate.from_messages([
@@ -46,9 +97,14 @@ class ReviewChain:
             ("human", strategy.get_user_prompt_template()),
         ]).partial(format_instructions=self._evaluation_parser.get_format_instructions())
 
-        # 체인 실행
+        # 체인 실행 (with_retry가 적용된 LLM 사용)
         chain = prompt | self._llm | self._evaluation_parser
         result: EvaluationResult = await chain.ainvoke(strategy.build_prompt_variables(context))
+
+        logger.info(
+            f"평가 완료: target_type={context.target_type}",
+            extra={"resume_id": context.resume_id},
+        )
 
         # 메타데이터 설정
         result.target_type = context.target_type
@@ -64,6 +120,10 @@ class ReviewChain:
         evaluation: EvaluationResult
     ) -> ReviewResult:
         """2단계: 평가 결과를 바탕으로 개선안 생성."""
+        logger.info(
+            f"개선 시작: target_type={context.target_type}",
+            extra={"resume_id": context.resume_id},
+        )
 
         # 프롬프트 생성
         prompt = ChatPromptTemplate.from_messages([
@@ -71,10 +131,14 @@ class ReviewChain:
             ("human", strategy.get_improvement_prompt_template()),
         ]).partial(format_instructions=self._improvement_parser.get_format_instructions())
 
-        # 체인 실행
         chain = prompt | self._llm | self._improvement_parser
         result: ReviewResult = await chain.ainvoke(
             strategy.build_improvement_variables(context, evaluation)
+        )
+
+        logger.info(
+            f"개선 완료: target_type={context.target_type}",
+            extra={"resume_id": context.resume_id},
         )
 
         # 평가 결과를 최종 결과에 포함
@@ -114,9 +178,35 @@ class SectionReviewChain:
             for block in context.section.blocks
         ]
 
-        # 병렬 실행
-        results = await asyncio.gather(
-            *[self._single_chain.run(ctx) for ctx in block_contexts]
+        logger.info(
+            f"섹션 리뷰 시작: {len(block_contexts)}개 블록 병렬 처리",
+            extra={
+                "resume_id": context.resume_id,
+                "section_type": context.section.section_type,
+            },
         )
 
-        return list(results)
+        try:
+            results = await asyncio.gather(
+                *[self._single_chain.run(ctx) for ctx in block_contexts],
+                return_exceptions=False,
+            )
+
+            logger.info(
+                f"섹션 리뷰 완료: {len(results)}개 블록 처리 완료",
+                extra={"resume_id": context.resume_id},
+            )
+
+            return list(results)
+
+        except Exception as e:
+            logger.error(
+                f"섹션 리뷰 실패: {e}",
+                extra={
+                    "resume_id": context.resume_id,
+                    "section_type": context.section.section_type,
+                    "total_blocks": len(block_contexts),
+                },
+                exc_info=True,
+            )
+            raise
