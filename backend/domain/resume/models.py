@@ -1,7 +1,7 @@
 from datetime import datetime
 from uuid import UUID
 
-from pydantic import BaseModel, ConfigDict, Field, field_validator
+from pydantic import BaseModel, ConfigDict, EmailStr, Field, field_validator
 from pydantic.alias_generators import to_camel
 from pydantic_core import Url
 
@@ -22,7 +22,7 @@ class Profile(BaseModel):
     name: str = Field(..., min_length=1, max_length=100, description="이름")
     position: str = Field(..., min_length=1, max_length=100, description="직무")
     introduction: str = Field(..., min_length=1, max_length=2000, description="소개글")
-    email: str = Field(..., min_length=1, max_length=255, description="이메일")
+    email: EmailStr = Field(..., min_length=1, max_length=255, description="이메일")
     phone: str = Field(..., min_length=1, max_length=50, description="전화번호")
     github: Url | None = Field(None, description="깃허브")
     blog: Url | None = Field(None, description="블로그")
