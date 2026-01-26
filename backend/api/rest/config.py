@@ -50,10 +50,33 @@ class APIConfig(BaseSettings):
         description="CORS 허용 도메인 (쉼표로 구분)",
     )
 
+    # Rate limiting 설정
+    rate_limit_enabled: bool = Field(
+        default=True,
+        description="Rate limiting 활성화 여부",
+    )
+    rate_limit_requests: int = Field(
+        default=100,
+        description="시간당 요청 제한 수 (requests per hour)",
+    )
+    rate_limit_reviews_per_hour: int = Field(
+        default=10,
+        description="시간당 리뷰 API 요청 제한 수",
+    )
+    rate_limit_skip_paths: str = Field(
+        default="/health,/",
+        description="Rate limiting을 적용하지 않을 경로 (쉼표로 구분)",
+    )
+
     @property
     def cors_origins(self) -> list[str]:
         """CORS 허용 도메인 리스트 반환."""
         return [origin.strip() for origin in self.allowed_origins.split(",")]
+
+    @property
+    def rate_limit_skip_paths_list(self) -> list[str]:
+        """Rate limiting 제외 경로 리스트 반환."""
+        return [path.strip() for path in self.rate_limit_skip_paths.split(",")]
 
     @property
     def is_dev(self) -> bool:

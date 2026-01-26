@@ -13,7 +13,7 @@ from backend.api.rest.exceptions import (
     value_error_handler,
 )
 from backend.api.rest.logging_config import setup_logging
-from backend.api.rest.middleware import LoggingMiddleware
+from backend.api.rest.middleware import LoggingMiddleware, RateLimitMiddleware
 from backend.api.rest.v1.routes.reviews import router as api_v1_reviews_router
 
 app = FastAPI(
@@ -24,12 +24,19 @@ app = FastAPI(
 
 api_config = get_api_config()
 
-# 로깅 설정
+# logging
 setup_logging(level="DEBUG" if api_config.is_dev else "INFO")
-
-# 로깅 미들웨어 등록
-app.add_middleware(LoggingMiddleware)
 logger = logging.getLogger(__name__)
+
+app.add_middleware(LoggingMiddleware)
+
+# Rate limiting
+if api_config.rate_limit_enabled:
+    app.add_middleware(
+        RateLimitMiddleware,
+        max_requests=api_config.rate_limit_requests,
+        skip_paths=api_config.rate_limit_skip_paths_list,
+    )
 
 app.add_middleware(
     CORSMiddleware,
@@ -39,7 +46,7 @@ app.add_middleware(
     allow_headers=["Content-Type", "Authorization"],
 )
 
-# 예외 핸들러 등록
+# Exception handlers
 app.add_exception_handler(ReviewValidationError, review_validation_error_handler)
 app.add_exception_handler(ReviewServiceError, review_service_error_handler)
 app.add_exception_handler(ValueError, value_error_handler)
@@ -57,11 +64,5 @@ async def root() -> dict[str, str]:
 @app.get("/health")
 async def health() -> dict[str, str]:
     """Health check endpoint."""
-
-    logger.info("Health check endpoint called")
-    logger.debug("Detailed debug information for health check")
-    logger.warning("This is a warning log from health check")
-    logger.error("This is an error log from health check")
-    logger.critical("This is a critical log from health check")
-    logger.error("This is an error log from health check")
+    logger.info("API Health Check")
     return {"status": "healthy"}
