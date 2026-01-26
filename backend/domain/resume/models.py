@@ -80,7 +80,10 @@ class Skills(BaseModel):
     testing: list[str] = Field(default_factory=list, max_length=30, description="테스팅 도구")
     collaboration: list[str] = Field(default_factory=list, max_length=30, description="협업 도구")
 
-    @field_validator("dev_ops", "language", "framework", "database", "tools", "library", "testing", "collaboration")
+    @field_validator(
+        "dev_ops", "language", "framework", "database",
+        "tools", "library", "testing", "collaboration"
+    )
     @classmethod
     def validate_skill_items(cls, v: list[str]) -> list[str]:
         """각 스킬 항목의 길이 검증."""

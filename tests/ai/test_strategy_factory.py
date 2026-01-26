@@ -3,7 +3,6 @@
 from uuid import uuid4
 
 import pytest
-
 from backend.ai.prompts.block import BlockPromptStrategy
 from backend.ai.prompts.full_resume import FullResumePromptStrategy
 from backend.ai.prompts.introduction import IntroductionPromptStrategy
@@ -268,7 +267,7 @@ class TestPromptStrategyFactoryEdgeCases:
 
         # 매번 새로운 인스턴스가 생성됨
         assert strategy1 is not strategy2
-        assert type(strategy1) == type(strategy2)
+        assert isinstance(strategy1) == isinstance(strategy2)
 
     def test_different_contexts_same_type(self) -> None:
         """같은 타입의 다른 컨텍스트에 대해 동일한 전략 타입 반환."""
@@ -296,6 +295,6 @@ class TestPromptStrategyFactoryEdgeCases:
         strategy1 = PromptStrategyFactory.get(context1)
         strategy2 = PromptStrategyFactory.get(context2)
 
-        assert type(strategy1) == type(strategy2)
+        assert isinstance(strategy1) == isinstance(strategy2)
         assert isinstance(strategy1, BlockPromptStrategy)
         assert isinstance(strategy2, BlockPromptStrategy)

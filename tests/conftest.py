@@ -4,11 +4,10 @@ from datetime import datetime
 from uuid import uuid4
 
 import pytest
-from fastapi.testclient import TestClient
-
 from backend.api.rest.main import app
 from backend.domain.resume.enums import SectionType
 from backend.domain.resume.models import Block, Profile, Resume, Section, Skills
+from fastapi.testclient import TestClient
 
 
 @pytest.fixture
@@ -53,7 +52,9 @@ def sample_block() -> Block:
         id=uuid4(),
         sub_title="AI 챗봇 서비스 개발",
         period="2023.01 - 2023.12",
-        content="FastAPI 기반 챗봇 백엔드 시스템 설계 및 구현. REST API 20개 개발, 응답 속도 50% 개선.",
+        content="""
+            FastAPI 기반 챗봇 백엔드 시스템 설계 및 구현. REST API 20개 개발, 응답 속도 50% 개선.
+        """,
         is_visible=True,
         tech_stack=["Python", "FastAPI", "PostgreSQL", "Redis"],
         link="https://github.com/example/chatbot",
@@ -73,7 +74,9 @@ def sample_section(sample_block: Block) -> Section:
 
 
 @pytest.fixture
-def sample_resume(sample_profile: Profile, sample_section: Section, sample_skills: Skills) -> Resume:
+def sample_resume(
+    sample_profile: Profile, sample_section: Section, sample_skills: Skills
+) -> Resume:
     """샘플 Resume 데이터."""
     return Resume(
         id="507f1f77bcf86cd799439011",

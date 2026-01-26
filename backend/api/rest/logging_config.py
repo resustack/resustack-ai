@@ -20,10 +20,16 @@ def setup_logging(level: str = "INFO"):
                 "format": "%(asctime)s - %(name)s - %(levelname)s - %(message)s",
             },
             "detailed": {
-                "format": "%(asctime)s - %(name)s - %(levelname)s - %(filename)s:%(lineno)d - %(funcName)s - %(message)s",
+                "format": """
+                %(asctime)s - %(name)s - %(levelname)s - %(filename)s:%(lineno)d
+                - %(funcName)s - %(message)s
+                """,
             },
             "json": {
-                "format": '{"timestamp": "%(asctime)s", "logger": "%(name)s", "level": "%(levelname)s", "message": "%(message)s", "file": "%(filename)s", "line": %(lineno)d}',
+                "format": """{
+                    "timestamp": "%(asctime)s", "logger": "%(name)s", "level": "%(levelname)s",
+                    "message": "%(message)s", "file": "%(filename)s", "line": %(lineno)d
+                }""",
             },
         },
         "handlers": {

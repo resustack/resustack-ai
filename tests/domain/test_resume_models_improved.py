@@ -1,14 +1,10 @@
 """개선된 도메인 모델 테스트 - Factory Pattern 활용."""
 
-from datetime import datetime
 from uuid import uuid4
 
 import pytest
+from backend.domain.resume.models import Block, Profile, Skills
 from pydantic import ValidationError
-
-from backend.domain.resume.enums import SectionType
-from backend.domain.resume.models import Block, Profile, Resume, Section, Skills
-
 
 # ============================================================================
 # Test Data Factories (재사용 가능한 정상 데이터)
@@ -246,7 +242,10 @@ class TestSkills:
 
     @pytest.mark.parametrize(
         "field_name",
-        ["language", "framework", "database", "dev_ops", "tools", "library", "testing", "collaboration"],
+        [
+            "language", "framework", "database", "dev_ops", "tools",
+            "library", "testing", "collaboration"
+        ],
     )
     def test_skills_all_fields_accept_valid_data(
         self, valid_skills_data: dict, field_name: str

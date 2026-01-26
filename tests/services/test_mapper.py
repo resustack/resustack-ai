@@ -3,7 +3,6 @@
 from uuid import uuid4
 
 import pytest
-
 from backend.ai.output.review_result import ReviewResult, SectionReviewResult
 from backend.services.review.enums import ReviewTargetType
 from backend.services.review.mapper import (

@@ -4,7 +4,6 @@ from pathlib import Path
 from unittest.mock import mock_open, patch
 
 import pytest
-
 from backend.utils.yaml_loader import (
     _get_prompts_dir,
     clear_prompt_cache,

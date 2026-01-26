@@ -5,8 +5,7 @@ from unittest.mock import AsyncMock, MagicMock
 from uuid import uuid4
 
 import pytest
-
-from backend.ai.output.review_result import ReviewResult, SectionReviewResult
+from backend.ai.output.review_result import ReviewResult
 from backend.api.rest.v1.schemas.resumes import (
     ResumeBlockReviewRequest,
     ResumeReviewRequest,
@@ -327,7 +326,7 @@ class TestReviewServiceSection:
         mock_section_chain.run.return_value = block_results
 
         # 실행
-        result = await review_service.review_section(
+        _ = await review_service.review_section(
             resume_id, SectionType.PROJECT, request
         )
 

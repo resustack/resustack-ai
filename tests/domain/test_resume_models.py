@@ -4,10 +4,9 @@ from datetime import datetime
 from uuid import uuid4
 
 import pytest
-from pydantic import ValidationError
-
 from backend.domain.resume.enums import SectionType
 from backend.domain.resume.models import Block, Profile, Resume, Section, Skills
+from pydantic import ValidationError
 
 
 class TestProfile:

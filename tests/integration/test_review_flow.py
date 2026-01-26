@@ -5,15 +5,11 @@ from unittest.mock import AsyncMock, MagicMock
 from uuid import uuid4
 
 import pytest
-from fastapi.testclient import TestClient
-
-from backend.ai.output.review_result import ReviewResult
 from backend.api.rest.main import app
 from backend.api.rest.v1.schemas.reviews import ReviewResponse, SectionReviewResponse
-from backend.domain.resume.models import Block, Profile, Skills
 from backend.services.review import get_review_service
-from backend.services.review.enums import ReviewTargetType
 from backend.services.review.service import ReviewService
+from fastapi.testclient import TestClient
 
 
 def create_full_resume_json(profile_override: dict | None = None) -> dict:
@@ -77,7 +73,10 @@ class TestReviewIntegrationFlow:
             strengths=["기술 스택 구체적", "경력 명시"],
             weaknesses=["차별화 포인트 부족"],
             improvement_suggestion="본인만의 강점을 추가하세요",
-            improved_content="저는 3년차 백엔드 개발자로, FastAPI를 활용한 마이크로서비스 아키텍처 설계 경험이 있습니다...",
+            improved_content="""
+                저는 3년차 백엔드 개발자로,
+                FastAPI를 활용한 마이크로서비스 아키텍처 설계 경험이 있습니다.
+            """,
         )
         mock_service.review_introduction = AsyncMock(return_value=mock_response)
 

@@ -5,17 +5,15 @@ from unittest.mock import AsyncMock, MagicMock
 from uuid import uuid4
 
 import pytest
-from fastapi.testclient import TestClient
-
 from backend.api.rest.main import app
 from backend.api.rest.v1.schemas.reviews import (
     BlockReviewResponse,
     ReviewResponse,
     SectionReviewResponse,
 )
-from backend.domain.resume.enums import SectionType
 from backend.services.review import get_review_service
 from backend.services.review.service import ReviewService
+from fastapi.testclient import TestClient
 
 
 def create_full_resume_json(profile_override: dict | None = None) -> dict:
