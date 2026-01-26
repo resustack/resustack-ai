@@ -39,9 +39,26 @@ async def review_block(
     섹션 내 특정 블록 하나만 선택하여 상세 평가합니다.
     예: 여러 프로젝트 중 하나의 프로젝트만 리뷰
     """
-    return await service.review_block(
+    logger.info(
+        "Block review request received",
+        extra={
+            "resume_id": str(resume_id),
+            "section_type": section_type.value,
+            "section_id": str(section_id),
+            "block_id": str(block_id),
+        },
+    )
+
+    response = await service.review_block(
         resume_id, section_type, section_id, block_id, request
     )
+
+    logger.info(
+        "Block review request completed",
+        extra={"resume_id": str(resume_id), "block_id": str(block_id)},
+    )
+
+    return response
 
 
 @router.post(
@@ -60,7 +77,18 @@ async def review_introduction(
 
     핵심 역량 명확성, 차별화 포인트, 직무 연관성 등을 평가합니다.
     """
-    return await service.review_introduction(resume_id, request)
+    logger.info(
+        "Introduction review request received",
+        extra={"resume_id": str(resume_id), "position": request.profile.position},
+    )
+
+    response = await service.review_introduction(resume_id, request)
+
+    logger.info(
+        "Introduction review request completed", extra={"resume_id": str(resume_id)}
+    )
+
+    return response
 
 
 @router.post(
@@ -79,7 +107,13 @@ async def review_skills(
 
     기술 스택 구성, 깊이 vs 넓이, 최신 트렌드 반영 등을 평가합니다.
     """
-    return await service.review_skill(resume_id, request)
+    logger.info("Skill review request received", extra={"resume_id": str(resume_id)})
+
+    response = await service.review_skill(resume_id, request)
+
+    logger.info("Skill review request completed", extra={"resume_id": str(resume_id)})
+
+    return response
 
 
 @router.post(
@@ -104,7 +138,24 @@ async def review_section(
     - **project**: 기술적 깊이 및 비즈니스 임팩트 평가
     - **education**: 직무 연관성 및 학습 성과 평가
     """
-    return await service.review_section(resume_id, section_type, request)
+    logger.info(
+        "Section review request received",
+        extra={
+            "resume_id": str(resume_id),
+            "section_type": section_type.value,
+            "section_id": str(section_id),
+            "block_count": len(request.blocks),
+        },
+    )
+
+    response = await service.review_section(resume_id, section_type, request)
+
+    logger.info(
+        "Section review request completed",
+        extra={"resume_id": str(resume_id), "section_type": section_type.value},
+    )
+
+    return response
 
 
 @router.post(
@@ -123,4 +174,13 @@ async def review_resume_summary(
 
     이력서의 전체 구성, 일관성, 차별화 포인트 등을 종합 평가합니다.
     """
-    return await service.review_summary(resume_id, request)
+    logger.info(
+        "Full resume review request received",
+        extra={"resume_id": str(resume_id), "section_count": len(request.sections)},
+    )
+
+    response = await service.review_summary(resume_id, request)
+
+    logger.info("Full resume review request completed", extra={"resume_id": str(resume_id)})
+
+    return response

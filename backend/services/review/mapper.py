@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import logging
 from functools import lru_cache
 from typing import TYPE_CHECKING
 from uuid import UUID
@@ -13,6 +14,8 @@ from backend.api.rest.v1.schemas.reviews import (
 if TYPE_CHECKING:
     from backend.ai.output.review_result import ReviewResult, SectionReviewResult
 
+logger = logging.getLogger(__name__)
+
 
 class ReviewResponseMapper:
     """리뷰 결과를 API Response로 변환하는 매퍼."""
@@ -20,6 +23,17 @@ class ReviewResponseMapper:
     @staticmethod
     def to_review_response(resume_id: UUID, result: ReviewResult) -> ReviewResponse:
         """ReviewResult → ReviewResponse 변환."""
+        logger.debug(
+            "Mapping review result to response",
+            extra={
+                "resume_id": str(resume_id),
+                "target_type": result.target_type.value,
+                "has_improved_content": bool(result.improved_content),
+                "strength_count": len(result.strengths),
+                "weakness_count": len(result.weaknesses),
+            },
+        )
+
         return ReviewResponse(
             resume_id=resume_id,
             target_type=result.target_type.value,
@@ -37,6 +51,16 @@ class ReviewResponseMapper:
         result: SectionReviewResult,
     ) -> SectionReviewResponse:
         """SectionReviewResult → SectionReviewResponse 변환."""
+        logger.debug(
+            "Mapping section review result to response",
+            extra={
+                "resume_id": str(resume_id),
+                "target_type": result.target_type.value,
+                "section_id": str(result.section_id),
+                "block_result_count": len(result.block_results),
+            },
+        )
+
         block_responses = [
             BlockReviewResponse(
                 block_id=br.block_id,

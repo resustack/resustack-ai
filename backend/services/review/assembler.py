@@ -1,3 +1,4 @@
+import logging
 from functools import lru_cache
 from uuid import UUID
 
@@ -17,6 +18,8 @@ from backend.services.review.context import (
 )
 from backend.services.review.enums import ReviewTargetType
 
+logger = logging.getLogger(__name__)
+
 
 class ReviewContextAssembler:
     """Request를 해석하여 ReviewContext를 조립하는 클래스.
@@ -30,6 +33,15 @@ class ReviewContextAssembler:
         request: ResumeReviewRequest,
     ) -> ReviewContext:
         """전체 이력서 리뷰용 컨텍스트 조립."""
+        logger.debug(
+            "Assembling full resume context",
+            extra={
+                "resume_id": str(resume_id),
+                "section_count": len(request.sections),
+                "has_skills": bool(request.skills),
+            },
+        )
+
         lines = []
 
         # 프로필 섹션
@@ -52,13 +64,16 @@ class ReviewContextAssembler:
             "collaboration": "협업 도구",
         }
         skills = request.skills
+        skill_count = 0
         for field_name, label in skill_labels.items():
             skill_list = getattr(skills, field_name, None)
             if skill_list:
                 lines.append(f"- {label}: {', '.join(skill_list)}")
+                skill_count += len(skill_list)
         lines.append("")
 
         # 섹션들
+        total_blocks = 0
         for section in request.sections:
             lines.append(f"## {section.title}")
             for block in section.blocks:
@@ -67,8 +82,20 @@ class ReviewContextAssembler:
                 if block.tech_stack:
                     lines.append(f"기술: {', '.join(block.tech_stack)}")
                 lines.append("")
+                total_blocks += 1
 
         full_text = "\n".join(lines)
+
+        logger.info(
+            "Full resume context assembled",
+            extra={
+                "resume_id": str(resume_id),
+                "text_length": len(full_text),
+                "section_count": len(request.sections),
+                "total_blocks": total_blocks,
+                "total_skills": skill_count,
+            },
+        )
 
         return ReviewContext(
             resume_id=resume_id,
@@ -82,6 +109,15 @@ class ReviewContextAssembler:
         request: ResumeReviewRequest,
     ) -> ReviewContext:
         """소개글 리뷰용 컨텍스트 조립."""
+        logger.debug(
+            "Assembling introduction context",
+            extra={
+                "resume_id": str(resume_id),
+                "position": request.profile.position,
+                "intro_length": len(request.profile.introduction),
+            },
+        )
+
         work_exp_summary = self._preprocess_section(request, SectionType.WORK_EXPERIENCE)
         project_summary = self._preprocess_section(request, SectionType.PROJECT)
 
@@ -91,6 +127,15 @@ class ReviewContextAssembler:
             content=request.profile.introduction,
             work_experience_summary=work_exp_summary,
             project_summary=project_summary,
+        )
+
+        logger.info(
+            "Introduction context assembled",
+            extra={
+                "resume_id": str(resume_id),
+                "has_work_exp": work_exp_summary != "없음",
+                "has_projects": project_summary != "없음",
+            },
         )
 
         return ReviewContext(
@@ -105,6 +150,29 @@ class ReviewContextAssembler:
         request: ResumeSkillReviewRequest,
     ) -> ReviewContext:
         """스킬 리뷰용 컨텍스트 조립."""
+        skill_count = sum(
+            [
+                len(request.skills.dev_ops),
+                len(request.skills.language),
+                len(request.skills.framework),
+                len(request.skills.database),
+                len(request.skills.tools),
+                len(request.skills.library),
+                len(request.skills.testing),
+                len(request.skills.collaboration),
+            ]
+        )
+
+        logger.debug(
+            "Assembling skill context",
+            extra={"resume_id": str(resume_id), "total_skills": skill_count},
+        )
+
+        if skill_count == 0:
+            logger.warning(
+                "No skills provided for skill review", extra={"resume_id": str(resume_id)}
+            )
+
         skill_data = SkillData(
             dev_ops=request.skills.dev_ops,
             language=request.skills.language,
@@ -114,6 +182,11 @@ class ReviewContextAssembler:
             library=request.skills.library,
             testing=request.skills.testing,
             collaboration=request.skills.collaboration,
+        )
+
+        logger.info(
+            "Skill context assembled",
+            extra={"resume_id": str(resume_id), "total_skills": skill_count},
         )
 
         return ReviewContext(
@@ -129,6 +202,23 @@ class ReviewContextAssembler:
         request: ResumeSectionReviewRequest,
     ) -> ReviewContext:
         """섹션 리뷰용 컨텍스트 조립."""
+        block_count = len(request.blocks)
+
+        logger.debug(
+            "Assembling section context",
+            extra={
+                "resume_id": str(resume_id),
+                "section_type": section_type.value,
+                "section_id": str(request.id),
+                "block_count": block_count,
+            },
+        )
+
+        if block_count == 0:
+            logger.warning(
+                "No blocks provided for section review",
+                extra={"resume_id": str(resume_id), "section_type": section_type.value},
+            )
 
         blocks = [
             BlockData(
@@ -149,6 +239,15 @@ class ReviewContextAssembler:
             blocks=blocks,
         )
 
+        logger.info(
+            "Section context assembled",
+            extra={
+                "resume_id": str(resume_id),
+                "section_type": section_type.value,
+                "block_count": block_count,
+            },
+        )
+
         return ReviewContext(
             resume_id=resume_id,
             target_type=ReviewTargetType.from_section_type(section_type),
@@ -164,6 +263,17 @@ class ReviewContextAssembler:
         request: ResumeBlockReviewRequest,
     ) -> ReviewContext:
         """블록 리뷰용 컨텍스트 조립."""
+        logger.debug(
+            "Assembling block context",
+            extra={
+                "resume_id": str(resume_id),
+                "section_type": section_type.value,
+                "section_id": str(section_id),
+                "block_id": str(block_id),
+                "content_length": len(request.content),
+                "has_tech_stack": bool(request.tech_stack),
+            },
+        )
 
         block_data = BlockData(
             block_id=request.id,
@@ -172,6 +282,15 @@ class ReviewContextAssembler:
             content=request.content,
             tech_stack=request.tech_stack,
             link=str(request.link) if request.link else None,
+        )
+
+        logger.info(
+            "Block context assembled",
+            extra={
+                "resume_id": str(resume_id),
+                "section_type": section_type.value,
+                "block_id": str(block_id),
+            },
         )
 
         return ReviewContext(
@@ -192,7 +311,15 @@ class ReviewContextAssembler:
                 for block in section.blocks:
                     summary = f"- {block.sub_title} ({block.period}): {block.content}"
                     summaries.append(summary)
-        return "\n".join(summaries) if summaries else "없음"
+
+        result = "\n".join(summaries) if summaries else "없음"
+
+        logger.debug(
+            "Section preprocessed for summary",
+            extra={"section_type": section_type.value, "block_count": len(summaries)},
+        )
+
+        return result
 
 
 @lru_cache

@@ -1,3 +1,4 @@
+import logging
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
@@ -10,6 +11,8 @@ from backend.api.rest.exceptions import (
     review_validation_error_handler,
     value_error_handler,
 )
+from backend.api.rest.logging_config import setup_logging
+from backend.api.rest.middleware import LoggingMiddleware
 from backend.api.rest.v1.routes.reviews import router as api_v1_reviews_router
 
 app = FastAPI(
@@ -19,6 +22,13 @@ app = FastAPI(
 )
 
 api_config = get_api_config()
+
+# 로깅 설정
+setup_logging(level="DEBUG" if api_config.is_dev else "INFO")
+
+# 로깅 미들웨어 등록
+app.add_middleware(LoggingMiddleware)
+logger = logging.getLogger(__name__)
 
 app.add_middleware(
     CORSMiddleware,
@@ -46,4 +56,11 @@ async def root() -> dict[str, str]:
 @app.get("/health")
 async def health() -> dict[str, str]:
     """Health check endpoint."""
+
+    logger.info("Health check endpoint called")
+    logger.debug("Detailed debug information for health check")
+    logger.warning("This is a warning log from health check")
+    logger.error("This is an error log from health check")
+    logger.critical("This is a critical log from health check")
+    logger.error("This is an error log from health check")
     return {"status": "healthy"}
