@@ -1,7 +1,6 @@
 # Additional files
 memo/
 .cursor/
-.github/
 .vscode/
 
 # Created by https://www.toptal.com/developers/gitignore/api/python,visualstudiocode,macos
