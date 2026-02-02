@@ -96,14 +96,14 @@ class TestReviewIntegrationFlow:
         mock_service.review_introduction.assert_called_once()
 
     @pytest.mark.asyncio
-    async def test_block_review_with_validation_error(self, client: TestClient) -> None:
+    async def test_block_review_with_validation_error(self, mock_client: TestClient) -> None:
         """블록 리뷰 - 잘못된 입력 검증."""
         resume_id = uuid4()
         section_id = uuid4()
         block_id = uuid4()
 
         # 필수 필드 누락
-        response = client.post(
+        response = mock_client.post(
             f"/api/v1/resumes/{resume_id}/reviews/sections/project/{section_id}/blocks/{block_id}",
             json={
                 "id": str(block_id),
