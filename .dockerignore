@@ -1,0 +1,46 @@
+# 버전 관리
+.git
+.gitignore
+.github
+
+# 개발 도구
+.venv
+.vscode
+.cursor
+.claude
+.pre-commit-config.yaml
+
+# IDE
+.idea
+*.swp
+*.swo
+*~
+.DS_Store
+
+# 테스트 및 빌드
+.pytest_cache
+.mypy_cache
+.ruff_cache
+__pycache__
+*.pyc
+*.pyo
+build/
+dist/
+*.egg-info
+
+# 로그 및 임시 파일
+logs/
+*.log
+.env
+.env.local
+.env.*.local
+
+# 문서
+memo/
+README.md
+Makefile
+*.md
+
+# Docker
+docker-compose.yml
+Dockerfile*

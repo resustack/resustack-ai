@@ -1,0 +1,74 @@
+services:
+  api:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: resustack-api
+    ports:
+      - "${APP_PORT:-8000}:${APP_PORT:-8000}"
+    environment:
+      # 실행 환경
+      ENV: ${ENV:-prod}
+      APP_HOST: 0.0.0.0
+      APP_PORT: ${APP_PORT:-8000}
+
+      # 로깅
+      LOG_LEVEL: ${LOG_LEVEL:-INFO}
+
+      # Anthropic API
+      ANTHROPIC_API_KEY: ${ANTHROPIC_API_KEY}
+      ANTHROPIC_MODEL: ${ANTHROPIC_MODEL:-claude-haiku-4-5-20251001}
+      ANTHROPIC_MAX_TOKENS: ${ANTHROPIC_MAX_TOKENS:-4096}
+      ANTHROPIC_TEMPERATURE: ${ANTHROPIC_TEMPERATURE:-0.7}
+      ANTHROPIC_TOP_P: ${ANTHROPIC_TOP_P:-0.9}
+
+      # CORS
+      ALLOWED_ORIGINS: ${ALLOWED_ORIGINS:-http://localhost:3000}
+
+      # Rate limiting
+      RATE_LIMIT_ENABLED: ${RATE_LIMIT_ENABLED:-true}
+      RATE_LIMIT_REQUESTS: ${RATE_LIMIT_REQUESTS:-100}
+      RATE_LIMIT_SKIP_PATHS: ${RATE_LIMIT_SKIP_PATHS:-/health,/}
+
+    volumes:
+      # 로그 디렉토리 볼륨마운트
+      - ./logs:/app/logs
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:${APP_PORT:-8000}/health"]
+      interval: 10m
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+    networks:
+      - resustack
+
+  # 개발 환경용 서비스 (선택사항)
+  api-dev:
+    build:
+      context: .
+      dockerfile: Dockerfile.dev
+    container_name: resustack-api-dev
+    ports:
+      - "8001:8000"
+    environment:
+      ENV: dev
+      APP_HOST: 0.0.0.0
+      APP_PORT: 8000
+      LOG_LEVEL: DEBUG
+      ANTHROPIC_API_KEY: ${ANTHROPIC_API_KEY}
+      ANTHROPIC_MODEL: ${ANTHROPIC_MODEL:-claude-haiku-4-5-20251001}
+      ALLOWED_ORIGINS: ${ALLOWED_ORIGINS:-http://localhost:3000}
+      RATE_LIMIT_ENABLED: "false"
+    volumes:
+      - ./backend:/app/backend
+      - ./logs:/app/logs
+    restart: unless-stopped
+    profiles:
+      - dev
+    networks:
+      - resustack
+
+networks:
+  resustack:
+    driver: bridge
