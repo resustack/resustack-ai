@@ -28,7 +28,7 @@ class AIConfig(BaseSettings):
         description="Anthropic API 키",
     )
     anthropic_model: str = Field(
-        default="claude-3-5-sonnet-20241022",
+        default="claude-haiku-4-5-20251001",
         description="사용할 Anthropic 모델명",
     )
     anthropic_max_tokens: int = Field(
