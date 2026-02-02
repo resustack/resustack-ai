@@ -18,7 +18,7 @@ from backend.services.review.assembler import ReviewContextAssembler
 from backend.services.review.context import ReviewContext
 from backend.services.review.enums import ReviewTargetType
 from backend.services.review.mapper import ReviewResponseMapper
-from backend.services.review.service import ReviewService
+from backend.services import ReviewService
 
 
 def create_resume_review_request(

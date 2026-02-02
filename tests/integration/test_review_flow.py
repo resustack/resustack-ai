@@ -7,8 +7,8 @@ from uuid import uuid4
 import pytest
 from backend.api.rest.main import app
 from backend.api.rest.v1.schemas.reviews import ReviewResponse, SectionReviewResponse
-from backend.services.review import get_review_service
-from backend.services.review.service import ReviewService
+from backend.services import get_review_service
+from backend.services import ReviewService
 from fastapi.testclient import TestClient
 
 
