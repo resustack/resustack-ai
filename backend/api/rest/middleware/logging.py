@@ -38,9 +38,10 @@ class LoggingMiddleware(BaseHTTPMiddleware):
         user_agent = request.headers.get("user-agent")
 
         logger.info(
-            f"Response: {response.status_code} - "
-            f"Time: {process_time:.4f}s - "
-            f"Path: {request.url.path}"
+            "method=%s path=%s status=%d duration_ms=%.2f",
+            request.method,
+            request.url.path,
+            response.status_code,
+            process_time
         )
-
         return response
