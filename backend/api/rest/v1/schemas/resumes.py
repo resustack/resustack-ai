@@ -1,6 +1,9 @@
+from uuid import UUID
+
+from pydantic import Field
+
 from backend.domain.resume.models import Block, Resume, Section, Skills
 from backend.utils.schema_base import CamelCaseMixin, CamelModel
-from pydantic import Field
 
 
 class ResumeReviewRequest(CamelCaseMixin, Resume):
@@ -18,7 +21,7 @@ class ResumeSectionReviewRequest(CamelCaseMixin, Section):
 class ResumeBlockReviewRequest(CamelCaseMixin, Block):
     """이력서 블록 리뷰 요청 모델."""
 
-    pass
+    section_id: UUID = Field(..., description="섹션 ID")
 
 
 class ResumeSkillReviewRequest(CamelModel):

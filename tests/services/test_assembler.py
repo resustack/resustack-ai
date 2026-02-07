@@ -384,6 +384,7 @@ class TestAssembleBlock:
         block_id = uuid4()
 
         request = ResumeBlockReviewRequest(
+            section_id=section_id,
             id=block_id,
             sub_title="AI 챗봇 서비스",
             period="2023.01 - 2023.12",
@@ -413,6 +414,7 @@ class TestAssembleBlock:
         block_id = uuid4()
 
         request = ResumeBlockReviewRequest(
+            section_id=section_id,
             id=block_id,
             sub_title="ABC 회사",
             period="2021.01 - 2023.12",
@@ -436,6 +438,7 @@ class TestAssembleBlock:
         block_id = uuid4()
 
         request = ResumeBlockReviewRequest(
+            section_id=section_id,
             id=block_id,
             sub_title="오픈소스 프로젝트",
             period="2023.01 - 2023.06",

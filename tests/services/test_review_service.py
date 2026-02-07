@@ -394,6 +394,7 @@ class TestReviewServiceBlock:
         )
 
         request = ResumeBlockReviewRequest(
+            section_id=section_id,
             id=block_id,
             sub_title=block.sub_title,
             period=block.period,

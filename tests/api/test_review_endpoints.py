@@ -182,9 +182,8 @@ class TestReviewSectionEndpoint:
         )
         mock_review_service.review_section = AsyncMock(return_value=mock_response)
 
-        # API 호출
         response = client_with_mock_service.post(
-            f"/api/v1/resumes/{resume_id}/reviews/sections/project/{section_id}",
+            f"/api/v1/resumes/{resume_id}/reviews/project",
             json={
                 "id": str(section_id),
                 "type": "project",
@@ -224,7 +223,7 @@ class TestReviewSectionEndpoint:
         section_id = uuid4()
 
         response = client.post(
-            f"/api/v1/resumes/{resume_id}/reviews/sections/invalid_type/{section_id}",
+            f"/api/v1/resumes/{resume_id}/reviews/invalid_type",
             json={
                 "id": str(section_id),
                 "type": "project",
@@ -263,8 +262,9 @@ class TestReviewBlockEndpoint:
         mock_review_service.review_block = AsyncMock(return_value=mock_response)
 
         response = client_with_mock_service.post(
-            f"/api/v1/resumes/{resume_id}/reviews/sections/project/{section_id}/blocks/{block_id}",
+            f"/api/v1/resumes/{resume_id}/reviews/project/block",
             json={
+                "sectionId": str(section_id),
                 "id": str(block_id),
                 "subTitle": "AI 챗봇 개발",
                 "period": "2023.01 - 2023.06",
