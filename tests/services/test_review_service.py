@@ -14,11 +14,11 @@ from backend.api.rest.v1.schemas.resumes import (
 )
 from backend.domain.resume.enums import SectionType
 from backend.domain.resume.models import Block, Profile, Section, Skills
+from backend.services import ReviewService
 from backend.services.review.assembler import ReviewContextAssembler
 from backend.services.review.context import ReviewContext
 from backend.services.review.enums import ReviewTargetType
 from backend.services.review.mapper import ReviewResponseMapper
-from backend.services import ReviewService
 
 
 def create_resume_review_request(

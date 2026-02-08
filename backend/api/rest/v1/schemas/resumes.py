@@ -1,9 +1,8 @@
 from uuid import UUID
 
-from pydantic import Field
-
 from backend.domain.resume.models import Block, Resume, Section, Skills
 from backend.utils.schema_base import CamelCaseMixin, CamelModel
+from pydantic import Field
 
 
 class ResumeReviewRequest(CamelCaseMixin, Resume):
