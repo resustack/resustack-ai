@@ -1,5 +1,8 @@
 # Resustack AI Service
 
+[![CI](https://github.com/hwstar/resustack/actions/workflows/ci.yml/badge.svg)](https://github.com/hwstar/resustack/actions/workflows/ci.yml)
+[![Security Scan](https://github.com/hwstar/resustack/actions/workflows/security.yml/badge.svg)](https://github.com/hwstar/resustack/actions/workflows/security.yml)
+
 AI-powered resume review service for Resustack platform. 이력서의 다양한 부분(소개글, 스킬, 경력, 프로젝트, 교육)을 AI로 평가하고 개선안을 제시하는 서비스입니다.
 
 ## Features
@@ -306,3 +309,66 @@ POST /api/v1/resumes/{resume_id}/reviews/summary
 ```
 
 섹션 리뷰의 경우 추가로 `overallEvaluation`과 `blockResults` 배열이 포함됩니다.
+
+## CI/CD
+
+이 프로젝트는 GitHub Actions를 사용한 자동화된 CI/CD 파이프라인을 제공합니다.
+
+### 워크플로우
+
+#### 1. CI (Continuous Integration)
+- **트리거**: `main`, `develop` 브랜치에 push 또는 PR
+- **작업**:
+  - 코드 린팅 (Ruff)
+  - 포매팅 체크
+  - 타입 체크 (MyPy)
+  - 단위/통합 테스트 실행
+  - Docker 이미지 빌드 테스트
+
+#### 2. PR Check
+- **트리거**: Pull Request 생성/업데이트
+- **작업**:
+  - 린트 및 테스트 실행
+  - PR에 자동으로 테스트 결과 코멘트
+
+#### 3. Security Scan
+- **트리거**: Push, PR, 매주 월요일 자동 실행
+- **작업**:
+  - 의존성 보안 검사
+  - Trivy 취약점 스캔 (파일시스템 + Docker 이미지)
+  - GitHub Security 탭에 결과 업로드
+
+#### 4. CD (Continuous Deployment)
+- **트리거**: `main` 브랜치 push 또는 버전 태그 (`v*.*.*`)
+- **작업**:
+  - Docker 이미지 빌드
+  - GitHub Container Registry에 푸시
+  - 이미지 attestation 생성
+
+### 배포 프로세스
+
+#### 개발 환경
+```bash
+# develop 브랜치에 push하면 자동으로 CI 실행
+git push origin develop
+```
+
+#### 프로덕션 배포
+```bash
+# 1. 버전 태그 생성
+git tag v1.0.0
+git push origin v1.0.0
+
+# 2. GitHub Container Registry에서 이미지 pull
+docker pull ghcr.io/hwstar/resustack:v1.0.0
+
+# 3. 이미지 실행
+docker run -p 8000:8000 --env-file .env ghcr.io/hwstar/resustack:v1.0.0
+```
+
+### Dependabot
+
+자동 의존성 업데이트를 위해 Dependabot이 설정되어 있습니다:
+- GitHub Actions 주간 업데이트
+- Python 패키지 주간 업데이트
+- Docker 베이스 이미지 주간 업데이트
