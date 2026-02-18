@@ -38,6 +38,8 @@ jobs:
 
     - name: Run tests
       run: uv run pytest -v --tb=short
+      env:
+        ANTHROPIC_API_KEY: test-dummy-key-for-ci
 
   build:
     name: Build Docker Image
