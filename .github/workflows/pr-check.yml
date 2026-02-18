@@ -29,18 +29,21 @@ jobs:
       run: uv sync
 
     - name: Run linting
+      id: lint
       run: |
         echo "::group::Ruff Check"
         uv run ruff check backend tests
         echo "::endgroup::"
 
     - name: Run formatting check
+      id: format
       run: |
         echo "::group::Ruff Format Check"
         uv run ruff format --check backend tests
         echo "::endgroup::"
 
     - name: Run tests with coverage
+      id: test
       run: |
         echo "::group::Pytest"
         uv run pytest -v --tb=short
@@ -53,17 +56,13 @@ jobs:
       uses: actions/github-script@v7
       with:
         script: |
+          const lint = '${{ steps.lint.outcome }}' === 'success' ? '✅' : '❌';
+          const fmt = '${{ steps.format.outcome }}' === 'success' ? '✅' : '❌';
+          const test = '${{ steps.test.outcome }}' === 'success' ? '✅' : '❌';
           const output = `#### Test Results 🧪
 
-          - ✅ Linting passed
-          - ✅ Formatting check passed
-          - ✅ Tests passed
+          - ${lint} Linting
+          - ${fmt} Formatting check
+          - ${test} Tests
 
           *Pushed by: @${{ github.actor }}, Action: \`${{ github.event_name }}\`*`;
-
-          github.rest.issues.createComment({
-            issue_number: context.issue.number,
-            owner: context.repo.owner,
-            repo: context.repo.repo,
-            body: output
-          })

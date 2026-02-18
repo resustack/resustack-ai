@@ -6,8 +6,8 @@ on:
   pull_request:
     branches: [ main ]
   schedule:
-    # 매주 월요일 오전 9시에 실행
-    - cron: '0 0 * * 1'
+    # 매주 월요일 00:00 KST (UTC 기준 일요일 15:00)에 실행
+    - cron: '0 0 * * 0'
 
 permissions:
   contents: read
@@ -23,7 +23,7 @@ jobs:
       uses: actions/checkout@v4
 
     - name: Run Trivy vulnerability scanner in repo mode
-      uses: aquasecurity/trivy-action@master
+      uses: aquasecurity/trivy-action@0.34.0
       with:
         scan-type: 'fs'
         scan-ref: '.'
@@ -50,7 +50,7 @@ jobs:
       run: docker build -t resustack-ai-service:scan .
 
     - name: Run Trivy vulnerability scanner on Docker image
-      uses: aquasecurity/trivy-action@master
+      uses: aquasecurity/trivy-action@0.34.0
       with:
         image-ref: 'resustack-ai-service:scan'
         format: 'sarif'
