@@ -326,9 +326,7 @@ class TestReviewServiceSection:
         mock_section_chain.run.return_value = block_results
 
         # 실행
-        _ = await review_service.review_section(
-            resume_id, SectionType.PROJECT, request
-        )
+        _ = await review_service.review_section(resume_id, SectionType.PROJECT, request)
 
         # 검증
         mock_assembler.assemble_section.assert_called_once_with(

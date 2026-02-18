@@ -60,9 +60,7 @@ class TestToReviewResponse:
         assert response.block_id == block_id
         assert response.target_type == "project_block"
 
-    def test_conversion_without_improved_content(
-        self, mapper: ReviewResponseMapper
-    ) -> None:
+    def test_conversion_without_improved_content(self, mapper: ReviewResponseMapper) -> None:
         """개선된 내용이 없는 경우 테스트."""
         resume_id = uuid4()
         result = ReviewResult(
@@ -169,9 +167,7 @@ class TestToSectionReviewResponse:
         assert response.block_results[0].evaluation_summary == "프로젝트 1 평가"
         assert response.block_results[1].block_id == block_id_2
 
-    def test_section_conversion_empty_blocks(
-        self, mapper: ReviewResponseMapper
-    ) -> None:
+    def test_section_conversion_empty_blocks(self, mapper: ReviewResponseMapper) -> None:
         """블록이 없는 섹션 변환 테스트."""
         resume_id = uuid4()
         section_id = uuid4()
@@ -189,9 +185,7 @@ class TestToSectionReviewResponse:
         assert response.target_type == "work_experience"
         assert len(response.block_results) == 0
 
-    def test_section_conversion_block_details(
-        self, mapper: ReviewResponseMapper
-    ) -> None:
+    def test_section_conversion_block_details(self, mapper: ReviewResponseMapper) -> None:
         """블록 상세 정보 변환 테스트."""
         resume_id = uuid4()
         section_id = uuid4()
@@ -224,9 +218,7 @@ class TestToSectionReviewResponse:
         assert block_response.improvement_suggestion == "동아리, 프로젝트 활동 추가"
         assert block_response.improved_content == "개선된 학력 설명..."
 
-    def test_section_conversion_multiple_blocks(
-        self, mapper: ReviewResponseMapper
-    ) -> None:
+    def test_section_conversion_multiple_blocks(self, mapper: ReviewResponseMapper) -> None:
         """여러 블록이 있는 섹션 변환 테스트."""
         resume_id = uuid4()
         section_id = uuid4()

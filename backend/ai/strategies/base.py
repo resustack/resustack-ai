@@ -84,9 +84,7 @@ class BasePromptStrategy(PromptStrategy):
     # ===== 개선 변수 (공통 구현) =====
 
     def build_improvement_variables(
-        self,
-        context: ReviewContext,
-        evaluation: EvaluationResult
+        self, context: ReviewContext, evaluation: EvaluationResult
     ) -> dict:
         """2단계: 평가 결과를 포함한 변수 딕셔너리 생성."""
         base_variables = self.build_prompt_variables(context)

@@ -332,9 +332,7 @@ class TestAssembleSection:
             profile=sample_profile,
         )
 
-        context = assembler.assemble_section(
-            resume_id, SectionType.WORK_EXPERIENCE, request
-        )
+        context = assembler.assemble_section(resume_id, SectionType.WORK_EXPERIENCE, request)
 
         assert context.target_type == ReviewTargetType.WORK_EXPERIENCE
 
@@ -348,7 +346,7 @@ class TestAssembleSection:
             Block(
                 id=uuid4(),
                 sub_title=f"프로젝트 {i}",
-                period=f"2023.0{i} - 2023.0{i+1}",
+                period=f"2023.0{i} - 2023.0{i + 1}",
                 content=f"프로젝트 {i} 내용",
                 is_visible=True,
                 tech_stack=["Python"],

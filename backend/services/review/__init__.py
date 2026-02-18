@@ -30,12 +30,14 @@ def get_review_service(
 def _get_review_chain():
     """지연 로딩으로 순환 참조 방지."""
     from backend.ai.chains import get_review_chain
+
     return get_review_chain()
 
 
 def _get_section_chain():
     """지연 로딩으로 순환 참조 방지."""
     from backend.ai.chains import get_review_section_chain
+
     return get_review_section_chain()
 
 

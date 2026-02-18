@@ -17,6 +17,7 @@ logger = logging.getLogger(__name__)
 
 router = APIRouter(prefix="/{resume_id}/reviews", tags=["AI Reviews"])
 
+
 @router.post(
     "/introduction",
     response_model=ReviewResponse,
@@ -40,9 +41,7 @@ async def review_introduction(
 
     response = await service.review_introduction(resume_id, request)
 
-    logger.info(
-        "Introduction review request completed", extra={"resume_id": str(resume_id)}
-    )
+    logger.info("Introduction review request completed", extra={"resume_id": str(resume_id)})
 
     return response
 
@@ -98,6 +97,7 @@ async def review_resume_summary(
     logger.info("Full resume review request completed", extra={"resume_id": str(resume_id)})
 
     return response
+
 
 @router.post(
     "/{section_type}/block",
