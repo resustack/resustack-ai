@@ -95,9 +95,7 @@ class TestPromptStrategyFactorySection:
             ],
         )
 
-    def test_get_work_experience_section_strategy(
-        self, sample_section_data: SectionData
-    ) -> None:
+    def test_get_work_experience_section_strategy(self, sample_section_data: SectionData) -> None:
         """WORK_EXPERIENCE 타입에 대해 SectionPromptStrategy 반환."""
         sample_section_data.section_type = SectionType.WORK_EXPERIENCE
         context = ReviewContext(
@@ -110,9 +108,7 @@ class TestPromptStrategyFactorySection:
 
         assert isinstance(strategy, SectionPromptStrategy)
 
-    def test_get_project_section_strategy(
-        self, sample_section_data: SectionData
-    ) -> None:
+    def test_get_project_section_strategy(self, sample_section_data: SectionData) -> None:
         """PROJECT 타입에 대해 SectionPromptStrategy 반환."""
         context = ReviewContext(
             resume_id=uuid4(),
@@ -124,9 +120,7 @@ class TestPromptStrategyFactorySection:
 
         assert isinstance(strategy, SectionPromptStrategy)
 
-    def test_get_education_section_strategy(
-        self, sample_section_data: SectionData
-    ) -> None:
+    def test_get_education_section_strategy(self, sample_section_data: SectionData) -> None:
         """EDUCATION 타입에 대해 SectionPromptStrategy 반환."""
         sample_section_data.section_type = SectionType.EDUCATION
         context = ReviewContext(
@@ -154,9 +148,7 @@ class TestPromptStrategyFactoryBlock:
             tech_stack=["Python", "FastAPI"],
         )
 
-    def test_get_work_experience_block_strategy(
-        self, sample_block_data: BlockData
-    ) -> None:
+    def test_get_work_experience_block_strategy(self, sample_block_data: BlockData) -> None:
         """WORK_EXPERIENCE_BLOCK 타입에 대해 BlockPromptStrategy 반환."""
         context = ReviewContext(
             resume_id=uuid4(),
@@ -257,9 +249,7 @@ class TestPromptStrategyFactoryEdgeCases:
         context = ReviewContext(
             resume_id=uuid4(),
             target_type=ReviewTargetType.INTRODUCTION,
-            introduction=IntroductionData(
-                name="테스트", position="개발자", content="내용"
-            ),
+            introduction=IntroductionData(name="테스트", position="개발자", content="내용"),
         )
 
         strategy1 = PromptStrategyFactory.get(context)
@@ -267,7 +257,7 @@ class TestPromptStrategyFactoryEdgeCases:
 
         # 매번 새로운 인스턴스가 생성됨
         assert strategy1 is not strategy2
-        assert type(strategy1) == type(strategy2)
+        assert type(strategy1) is type(strategy2)
 
     def test_different_contexts_same_type(self) -> None:
         """같은 타입의 다른 컨텍스트에 대해 동일한 전략 타입 반환."""
@@ -295,6 +285,6 @@ class TestPromptStrategyFactoryEdgeCases:
         strategy1 = PromptStrategyFactory.get(context1)
         strategy2 = PromptStrategyFactory.get(context2)
 
-        assert type(strategy1) == type(strategy2)
+        assert type(strategy1) is type(strategy2)
         assert isinstance(strategy1, BlockPromptStrategy)
         assert isinstance(strategy2, BlockPromptStrategy)

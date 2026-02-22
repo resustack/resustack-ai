@@ -64,9 +64,7 @@ class ReviewChain:
                 },
                 exc_info=True,
             )
-            raise ReviewServiceError(
-                "AI 응답 형식이 올바르지 않습니다. 다시 시도해주세요."
-            ) from e
+            raise ReviewServiceError("AI 응답 형식이 올바르지 않습니다. 다시 시도해주세요.") from e
 
         except Exception as e:
             logger.error(
@@ -80,11 +78,7 @@ class ReviewChain:
             )
             raise ReviewServiceError("서비스 처리 중 오류가 발생했습니다.") from e
 
-    async def _evaluate(
-        self,
-        strategy: PromptStrategy,
-        context: ReviewContext
-    ) -> EvaluationResult:
+    async def _evaluate(self, strategy: PromptStrategy, context: ReviewContext) -> EvaluationResult:
         """1단계: 평가만 수행."""
         logger.info(
             f"평가 시작: target_type={context.target_type}",
@@ -92,10 +86,12 @@ class ReviewChain:
         )
 
         # 프롬프트 생성
-        prompt = ChatPromptTemplate.from_messages([
-            ("system", strategy.build_evaluation_system_prompt()),
-            ("human", strategy.get_user_prompt_template()),
-        ]).partial(format_instructions=self._evaluation_parser.get_format_instructions())
+        prompt = ChatPromptTemplate.from_messages(
+            [
+                ("system", strategy.build_evaluation_system_prompt()),
+                ("human", strategy.get_user_prompt_template()),
+            ]
+        ).partial(format_instructions=self._evaluation_parser.get_format_instructions())
 
         # 체인 실행 (with_retry가 적용된 LLM 사용)
         chain = prompt | self._llm | self._evaluation_parser
@@ -114,10 +110,7 @@ class ReviewChain:
         return result
 
     async def _improve(
-        self,
-        strategy: PromptStrategy,
-        context: ReviewContext,
-        evaluation: EvaluationResult
+        self, strategy: PromptStrategy, context: ReviewContext, evaluation: EvaluationResult
     ) -> ReviewResult:
         """2단계: 평가 결과를 바탕으로 개선안 생성."""
         logger.info(
@@ -126,10 +119,12 @@ class ReviewChain:
         )
 
         # 프롬프트 생성
-        prompt = ChatPromptTemplate.from_messages([
-            ("system", strategy.build_improvement_system_prompt()),
-            ("human", strategy.get_improvement_prompt_template()),
-        ]).partial(format_instructions=self._improvement_parser.get_format_instructions())
+        prompt = ChatPromptTemplate.from_messages(
+            [
+                ("system", strategy.build_improvement_system_prompt()),
+                ("human", strategy.get_improvement_prompt_template()),
+            ]
+        ).partial(format_instructions=self._improvement_parser.get_format_instructions())
 
         chain = prompt | self._llm | self._improvement_parser
         result: ReviewResult = await chain.ainvoke(
@@ -163,9 +158,7 @@ class SectionReviewChain:
         if context.section is None:
             raise ValueError("Section data is required")
 
-        block_target_type = ReviewTargetType.from_section_type_block(
-            context.section.section_type
-        )
+        block_target_type = ReviewTargetType.from_section_type_block(context.section.section_type)
 
         # 모든 블록 컨텍스트 생성
         block_contexts = [

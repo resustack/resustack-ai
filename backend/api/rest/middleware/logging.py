@@ -42,6 +42,6 @@ class LoggingMiddleware(BaseHTTPMiddleware):
             request.method,
             request.url.path,
             response.status_code,
-            process_time
+            process_time,
         )
         return response

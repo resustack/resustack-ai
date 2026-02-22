@@ -7,8 +7,7 @@ from uuid import uuid4
 import pytest
 from backend.api.rest.main import app
 from backend.api.rest.v1.schemas.reviews import ReviewResponse, SectionReviewResponse
-from backend.services import get_review_service
-from backend.services import ReviewService
+from backend.services import ReviewService, get_review_service
 from fastapi.testclient import TestClient
 
 
@@ -102,10 +101,11 @@ class TestReviewIntegrationFlow:
         section_id = uuid4()
         block_id = uuid4()
 
-        # 필수 필드 누락
+        # 필수 필드 누락 - URL에서 section_id, block_id 제거됨
         response = mock_client.post(
-            f"/api/v1/resumes/{resume_id}/reviews/sections/project/{section_id}/blocks/{block_id}",
+            f"/api/v1/resumes/{resume_id}/reviews/project/block",
             json={
+                "sectionId": str(section_id),
                 "id": str(block_id),
                 # subTitle 누락
                 "period": "2023.01 - 2023.12",
@@ -164,7 +164,7 @@ class TestReviewIntegrationFlow:
         mock_service.review_section = AsyncMock(return_value=mock_response)
 
         response = mock_client.post(
-            f"/api/v1/resumes/{resume_id}/reviews/sections/project/{section_id}",
+            f"/api/v1/resumes/{resume_id}/reviews/project",
             json={
                 "id": str(section_id),
                 "type": "project",
@@ -308,8 +308,9 @@ class TestReviewDataFlow:
         mock_service.review_block = AsyncMock(return_value=mock_response)
 
         response = mock_client.post(
-            f"/api/v1/resumes/{resume_id}/reviews/sections/project/{section_id}/blocks/{block_id}",
+            f"/api/v1/resumes/{resume_id}/reviews/project/block",
             json={
+                "sectionId": str(section_id),
                 "id": str(block_id),
                 "subTitle": "마이크로서비스 구축",
                 "period": "2023.01 - 2023.12",

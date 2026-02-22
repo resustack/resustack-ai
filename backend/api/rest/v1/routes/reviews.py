@@ -11,54 +11,11 @@ from backend.api.rest.v1.schemas.resumes import (
 )
 from backend.api.rest.v1.schemas.reviews import ReviewResponse, SectionReviewResponse
 from backend.domain.resume.enums import SectionType
-from backend.services import get_review_service
-from backend.services import ReviewService
+from backend.services import ReviewService, get_review_service
 
 logger = logging.getLogger(__name__)
 
 router = APIRouter(prefix="/{resume_id}/reviews", tags=["AI Reviews"])
-
-
-@router.post(
-    "/sections/{section_type}/{section_id}/blocks/{block_id}",
-    response_model=ReviewResponse,
-    status_code=status.HTTP_200_OK,
-    summary="블록 리뷰",
-    description="특정 블록(경력/프로젝트/교육 항목 하나)을 평가합니다.",
-)
-async def review_block(
-    resume_id: UUID,
-    section_type: SectionType,
-    section_id: UUID,
-    block_id: UUID,
-    request: ResumeBlockReviewRequest,
-    service: ReviewService = Depends(get_review_service),
-) -> ReviewResponse:
-    """블록 리뷰.
-
-    섹션 내 특정 블록 하나만 선택하여 상세 평가합니다.
-    예: 여러 프로젝트 중 하나의 프로젝트만 리뷰
-    """
-    logger.info(
-        "Block review request received",
-        extra={
-            "resume_id": str(resume_id),
-            "section_type": section_type.value,
-            "section_id": str(section_id),
-            "block_id": str(block_id),
-        },
-    )
-
-    response = await service.review_block(
-        resume_id, section_type, section_id, block_id, request
-    )
-
-    logger.info(
-        "Block review request completed",
-        extra={"resume_id": str(resume_id), "block_id": str(block_id)},
-    )
-
-    return response
 
 
 @router.post(
@@ -84,9 +41,7 @@ async def review_introduction(
 
     response = await service.review_introduction(resume_id, request)
 
-    logger.info(
-        "Introduction review request completed", extra={"resume_id": str(resume_id)}
-    )
+    logger.info("Introduction review request completed", extra={"resume_id": str(resume_id)})
 
     return response
 
@@ -117,48 +72,6 @@ async def review_skills(
 
 
 @router.post(
-    "/sections/{section_type}/{section_id}",
-    response_model=SectionReviewResponse,
-    status_code=status.HTTP_200_OK,
-    summary="섹션 리뷰",
-    description="특정 섹션(경력/프로젝트/교육)의 모든 블록을 평가합니다.",
-)
-async def review_section(
-    resume_id: UUID,
-    section_type: SectionType,
-    section_id: UUID,
-    request: ResumeSectionReviewRequest,
-    service: ReviewService = Depends(get_review_service),
-) -> SectionReviewResponse:
-    """섹션 리뷰.
-
-    섹션 내 모든 블록을 순회하며 개별 평가 후 종합 결과를 반환합니다.
-
-    - **work_experience**: STAR 기법 기반 경력 평가
-    - **project**: 기술적 깊이 및 비즈니스 임팩트 평가
-    - **education**: 직무 연관성 및 학습 성과 평가
-    """
-    logger.info(
-        "Section review request received",
-        extra={
-            "resume_id": str(resume_id),
-            "section_type": section_type.value,
-            "section_id": str(section_id),
-            "block_count": len(request.blocks),
-        },
-    )
-
-    response = await service.review_section(resume_id, section_type, request)
-
-    logger.info(
-        "Section review request completed",
-        extra={"resume_id": str(resume_id), "section_type": section_type.value},
-    )
-
-    return response
-
-
-@router.post(
     "/summary",
     response_model=ReviewResponse,
     status_code=status.HTTP_200_OK,
@@ -182,5 +95,86 @@ async def review_resume_summary(
     response = await service.review_summary(resume_id, request)
 
     logger.info("Full resume review request completed", extra={"resume_id": str(resume_id)})
+
+    return response
+
+
+@router.post(
+    "/{section_type}/block",
+    response_model=ReviewResponse,
+    status_code=status.HTTP_200_OK,
+    summary="블록 리뷰",
+    description="특정 블록(경력/프로젝트/교육 항목 하나)을 평가합니다.",
+)
+async def review_block(
+    resume_id: UUID,
+    section_type: SectionType,
+    request: ResumeBlockReviewRequest,
+    service: ReviewService = Depends(get_review_service),
+) -> ReviewResponse:
+    """블록 리뷰.
+
+    섹션 내 특정 블록 하나만 선택하여 상세 평가합니다.
+    예: 여러 프로젝트 중 하나의 프로젝트만 리뷰
+    """
+    logger.info(
+        "Block review request received",
+        extra={
+            "resume_id": str(resume_id),
+            "section_type": section_type.value,
+            "section_id": str(request.section_id),
+            "block_id": str(request.id),
+        },
+    )
+
+    response = await service.review_block(
+        resume_id, section_type, request.section_id, request.id, request
+    )
+
+    logger.info(
+        "Block review request completed",
+        extra={"resume_id": str(resume_id), "block_id": str(request.id)},
+    )
+
+    return response
+
+
+@router.post(
+    "/{section_type}",
+    response_model=SectionReviewResponse,
+    status_code=status.HTTP_200_OK,
+    summary="섹션 리뷰",
+    description="특정 섹션(경력/프로젝트/교육)의 모든 블록을 평가합니다.",
+)
+async def review_section(
+    resume_id: UUID,
+    section_type: SectionType,
+    request: ResumeSectionReviewRequest,
+    service: ReviewService = Depends(get_review_service),
+) -> SectionReviewResponse:
+    """섹션 리뷰.
+
+    섹션 내 모든 블록을 순회하며 개별 평가 후 종합 결과를 반환합니다.
+
+    - **work_experience**: STAR 기법 기반 경력 평가
+    - **project**: 기술적 깊이 및 비즈니스 임팩트 평가
+    - **education**: 직무 연관성 및 학습 성과 평가
+    """
+    logger.info(
+        "Section review request received",
+        extra={
+            "resume_id": str(resume_id),
+            "section_type": section_type.value,
+            "section_id": str(request.id),
+            "block_count": len(request.blocks),
+        },
+    )
+
+    response = await service.review_section(resume_id, section_type, request)
+
+    logger.info(
+        "Section review request completed",
+        extra={"resume_id": str(resume_id), "section_type": section_type.value},
+    )
 
     return response

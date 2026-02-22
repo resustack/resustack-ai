@@ -38,9 +38,7 @@ class RateLimitStore:
 
         # 오래된 항목 제거
         self.requests[key] = [
-            (timestamp, count)
-            for timestamp, count in self.requests[key]
-            if timestamp > cutoff_time
+            (timestamp, count) for timestamp, count in self.requests[key] if timestamp > cutoff_time
         ]
 
         # 현재 윈도우 내 요청 수 계산
@@ -70,9 +68,7 @@ class RateLimitStore:
         cutoff_time = now - timedelta(seconds=window_seconds)
 
         current_count = sum(
-            count
-            for timestamp, count in self.requests[key]
-            if timestamp > cutoff_time
+            count for timestamp, count in self.requests[key] if timestamp > cutoff_time
         )
 
         return max(0, max_requests - current_count)
@@ -109,17 +105,12 @@ class RateLimitMiddleware(BaseHTTPMiddleware):
 
         # Rate limit 확인
         if not rate_limit_store.is_allowed(key, self.max_requests, self.window_seconds):
-            remaining = rate_limit_store.get_remaining(
-                key, self.max_requests, self.window_seconds
-            )
-            logger.warning(
-                f"Rate limit exceeded for {client_ip} on {request.url.path}"
-            )
+            remaining = rate_limit_store.get_remaining(key, self.max_requests, self.window_seconds)
+            logger.warning(f"Rate limit exceeded for {client_ip} on {request.url.path}")
             return JSONResponse(
                 status_code=429,
                 content={
-                    "detail": "Rate limit exceeded. "
-                    "Too many requests in a short time.",
+                    "detail": "Rate limit exceeded. Too many requests in a short time.",
                     "retry_after": self.window_seconds,
                 },
                 headers={
@@ -128,10 +119,7 @@ class RateLimitMiddleware(BaseHTTPMiddleware):
                     "X-RateLimit-Remaining": str(remaining),
                     "X-RateLimit-Reset": str(
                         int(
-                            (
-                                datetime.now(UTC)
-                                + timedelta(seconds=self.window_seconds)
-                            ).timestamp()
+                            (datetime.now(UTC) + timedelta(seconds=self.window_seconds)).timestamp()
                         )
                     ),
                 },
@@ -140,18 +128,11 @@ class RateLimitMiddleware(BaseHTTPMiddleware):
         response = await call_next(request)
 
         # Rate limit 정보를 응답 헤더에 추가
-        remaining = rate_limit_store.get_remaining(
-            key, self.max_requests, self.window_seconds
-        )
+        remaining = rate_limit_store.get_remaining(key, self.max_requests, self.window_seconds)
         response.headers["X-RateLimit-Limit"] = str(self.max_requests)
         response.headers["X-RateLimit-Remaining"] = str(remaining)
         response.headers["X-RateLimit-Reset"] = str(
-            int(
-                (
-                    datetime.now(UTC)
-                    + timedelta(seconds=self.window_seconds)
-                ).timestamp()
-            )
+            int((datetime.now(UTC) + timedelta(seconds=self.window_seconds)).timestamp())
         )
 
         return response

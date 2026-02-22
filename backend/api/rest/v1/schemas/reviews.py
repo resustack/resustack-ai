@@ -11,13 +11,9 @@ class ReviewResponse(CamelModel):
     target_type: str = Field(..., description="리뷰 대상 타입")
     evaluation_summary: str = Field(..., description="전반적인 평가 요약")
     strengths: list[str] = Field(default_factory=list, description="잘된 점 목록")
-    weaknesses: list[str] = Field(
-        default_factory=list, description="개선 필요점 목록"
-    )
+    weaknesses: list[str] = Field(default_factory=list, description="개선 필요점 목록")
     improvement_suggestion: str = Field(..., description="개선 제안 요약")
-    improved_content: str | None = Field(
-        None, description="개선된 문장/내용 (블록/아이템 리뷰 시)"
-    )
+    improved_content: str | None = Field(None, description="개선된 문장/내용 (블록/아이템 리뷰 시)")
     block_id: UUID | None = Field(None, description="리뷰한 블록 ID (블록 리뷰 시)")
 
 
@@ -27,9 +23,7 @@ class BlockReviewResponse(CamelModel):
     block_id: UUID | None = Field(None, description="블록 ID")
     evaluation_summary: str = Field(..., description="블록 평가 요약")
     strengths: list[str] = Field(default_factory=list, description="잘된 점 목록")
-    weaknesses: list[str] = Field(
-        default_factory=list, description="개선 필요점 목록"
-    )
+    weaknesses: list[str] = Field(default_factory=list, description="개선 필요점 목록")
     improvement_suggestion: str = Field(..., description="개선 제안")
     improved_content: str | None = Field(None, description="개선된 내용")
 
