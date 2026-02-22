@@ -14,11 +14,11 @@ from backend.api.rest.v1.schemas.resumes import (
 )
 from backend.domain.resume.enums import SectionType
 from backend.domain.resume.models import Block, Profile, Section, Skills
+from backend.services import ReviewService
 from backend.services.review.assembler import ReviewContextAssembler
 from backend.services.review.context import ReviewContext
 from backend.services.review.enums import ReviewTargetType
 from backend.services.review.mapper import ReviewResponseMapper
-from backend.services import ReviewService
 
 
 def create_resume_review_request(
@@ -326,9 +326,7 @@ class TestReviewServiceSection:
         mock_section_chain.run.return_value = block_results
 
         # 실행
-        _ = await review_service.review_section(
-            resume_id, SectionType.PROJECT, request
-        )
+        _ = await review_service.review_section(resume_id, SectionType.PROJECT, request)
 
         # 검증
         mock_assembler.assemble_section.assert_called_once_with(
@@ -394,6 +392,7 @@ class TestReviewServiceBlock:
         )
 
         request = ResumeBlockReviewRequest(
+            section_id=section_id,
             id=block_id,
             sub_title=block.sub_title,
             period=block.period,

@@ -55,9 +55,7 @@ class TestLoadPromptTemplate:
         mock_yaml_content = {"key1": "value1", "key2": "value2"}
 
         with patch("pathlib.Path.exists", return_value=True):
-            with patch(
-                "builtins.open", mock_open(read_data="key1: value1\nkey2: value2")
-            ):
+            with patch("builtins.open", mock_open(read_data="key1: value1\nkey2: value2")):
                 with patch("yaml.safe_load", return_value=mock_yaml_content) as mock_yaml:
                     # 첫 번째 호출
                     result1 = load_prompt_template("test_template")

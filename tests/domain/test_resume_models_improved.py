@@ -10,6 +10,7 @@ from pydantic import ValidationError
 # Test Data Factories (재사용 가능한 정상 데이터)
 # ============================================================================
 
+
 @pytest.fixture
 def valid_profile_data() -> dict:
     """정상적인 Profile 데이터 (딕셔너리)."""
@@ -52,6 +53,7 @@ def valid_skills_data() -> dict:
 # ============================================================================
 # Profile 테스트
 # ============================================================================
+
 
 class TestProfile:
     """Profile 모델 테스트 - Factory Pattern 활용."""
@@ -139,6 +141,7 @@ class TestProfile:
 # Block 테스트
 # ============================================================================
 
+
 class TestBlock:
     """Block 모델 테스트 - Factory Pattern 활용."""
 
@@ -149,9 +152,7 @@ class TestBlock:
         assert block.sub_title == valid_block_data["sub_title"]
         assert len(block.tech_stack) == len(valid_block_data["tech_stack"])
 
-    def test_block_tech_stack_validation_error_too_long_item(
-        self, valid_block_data: dict
-    ) -> None:
+    def test_block_tech_stack_validation_error_too_long_item(self, valid_block_data: dict) -> None:
         """tech_stack 항목이 100자 초과 시 실패."""
         invalid_data = {
             **valid_block_data,
@@ -161,9 +162,7 @@ class TestBlock:
         with pytest.raises(ValueError, match="100자를 초과할 수 없습니다"):
             Block(**invalid_data)
 
-    def test_block_tech_stack_validation_error_empty_string(
-        self, valid_block_data: dict
-    ) -> None:
+    def test_block_tech_stack_validation_error_empty_string(self, valid_block_data: dict) -> None:
         """tech_stack에 빈 문자열이 있으면 실패."""
         invalid_data = {
             **valid_block_data,
@@ -216,6 +215,7 @@ class TestBlock:
 # Skills 테스트
 # ============================================================================
 
+
 class TestSkills:
     """Skills 모델 테스트 - Factory Pattern 활용."""
 
@@ -243,8 +243,14 @@ class TestSkills:
     @pytest.mark.parametrize(
         "field_name",
         [
-            "language", "framework", "database", "dev_ops", "tools",
-            "library", "testing", "collaboration"
+            "language",
+            "framework",
+            "database",
+            "dev_ops",
+            "tools",
+            "library",
+            "testing",
+            "collaboration",
         ],
     )
     def test_skills_all_fields_accept_valid_data(
@@ -271,6 +277,7 @@ class TestSkills:
 # ============================================================================
 # Helper Functions (선택적)
 # ============================================================================
+
 
 def create_valid_profile(**overrides) -> Profile:
     """테스트용 Profile 생성 헬퍼 함수.

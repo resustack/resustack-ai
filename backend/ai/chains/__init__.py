@@ -8,6 +8,7 @@ def get_review_chain() -> ReviewChain:
     """ReviewChain 싱글톤 인스턴스 반환."""
     return ReviewChain()
 
+
 @lru_cache
 def get_review_section_chain() -> SectionReviewChain:
     """SectionReviewChain 싱글톤 인스턴스 반환."""

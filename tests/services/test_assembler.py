@@ -332,9 +332,7 @@ class TestAssembleSection:
             profile=sample_profile,
         )
 
-        context = assembler.assemble_section(
-            resume_id, SectionType.WORK_EXPERIENCE, request
-        )
+        context = assembler.assemble_section(resume_id, SectionType.WORK_EXPERIENCE, request)
 
         assert context.target_type == ReviewTargetType.WORK_EXPERIENCE
 
@@ -348,7 +346,7 @@ class TestAssembleSection:
             Block(
                 id=uuid4(),
                 sub_title=f"프로젝트 {i}",
-                period=f"2023.0{i} - 2023.0{i+1}",
+                period=f"2023.0{i} - 2023.0{i + 1}",
                 content=f"프로젝트 {i} 내용",
                 is_visible=True,
                 tech_stack=["Python"],
@@ -384,6 +382,7 @@ class TestAssembleBlock:
         block_id = uuid4()
 
         request = ResumeBlockReviewRequest(
+            section_id=section_id,
             id=block_id,
             sub_title="AI 챗봇 서비스",
             period="2023.01 - 2023.12",
@@ -413,6 +412,7 @@ class TestAssembleBlock:
         block_id = uuid4()
 
         request = ResumeBlockReviewRequest(
+            section_id=section_id,
             id=block_id,
             sub_title="ABC 회사",
             period="2021.01 - 2023.12",
@@ -436,6 +436,7 @@ class TestAssembleBlock:
         block_id = uuid4()
 
         request = ResumeBlockReviewRequest(
+            section_id=section_id,
             id=block_id,
             sub_title="오픈소스 프로젝트",
             period="2023.01 - 2023.06",
