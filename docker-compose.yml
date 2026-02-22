@@ -1,6 +1,6 @@
 services:
   api:
-    image: ghcr.io/hwstar/resustack:main
+    image: ghcr.io/resustack/resustack-ai:main
     container_name: resustack-api
     ports:
       - "${APP_PORT:-8000}:${APP_PORT:-8000}"
