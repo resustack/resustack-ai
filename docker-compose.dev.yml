@@ -1,0 +1,27 @@
+services:
+  api:
+    build:
+      context: .
+      dockerfile: Dockerfile.dev
+    container_name: resustack-api-dev
+    ports:
+      - "${APP_PORT:-8000}:${APP_PORT:-8000}"
+    environment:
+      ENV: dev
+      APP_HOST: 0.0.0.0
+      APP_PORT: ${APP_PORT:-8000}
+      LOG_LEVEL: DEBUG
+      ANTHROPIC_API_KEY: ${ANTHROPIC_API_KEY}
+      ANTHROPIC_MODEL: ${ANTHROPIC_MODEL:-claude-haiku-4-5-20251001}
+      ALLOWED_ORIGINS: ${ALLOWED_ORIGINS:-http://localhost:3000}
+      RATE_LIMIT_ENABLED: "false"
+    volumes:
+      - ./backend:/app/backend
+      - ./logs:/app/logs
+    restart: unless-stopped
+    networks:
+      - resustack
+
+networks:
+  resustack:
+    driver: bridge
