@@ -1,4 +1,4 @@
-FROM python:3.12-slim as builder
+FROM python:3.14-slim as builder
 
 WORKDIR /app
 
@@ -20,7 +20,7 @@ COPY pyproject.toml uv.lock ./
 RUN uv sync --frozen --no-dev
 
 # 애플리케이션 스테이지
-FROM python:3.12-slim
+FROM python:3.14-slim
 
 WORKDIR /app
 
